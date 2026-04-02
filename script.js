@@ -88,9 +88,13 @@ function setupHeroScrollMotion() {
 
 function setupRsvp() {
   if (rsvpForm === null || rsvpNote === null) return;
+  const submitButton = rsvpForm.querySelector('button[type="submit"]');
+  let isSubmitting = false;
 
-  rsvpForm.addEventListener('submit', (event) => {
+  rsvpForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+
+    if (isSubmitting) return;
 
     if (rsvpForm.checkValidity() === false) {
       rsvpNote.textContent = 'Please complete the required fields before submitting.';
@@ -98,16 +102,51 @@ function setupRsvp() {
     }
 
     const data = new FormData(rsvpForm);
-    const name = (data.get('name') || 'Guest').toString().trim();
-    const attendance = data.get('attendance');
+    const name = (data.get('name') || '').toString().trim();
+    const attendance = (data.get('attendance') || '').toString().trim();
+    const guests = (data.get('guests') || '1').toString().trim();
+    const dietary = (data.get('dietary') || '').toString().trim();
+    const message = (data.get('message') || '').toString().trim();
 
-    if (attendance === 'yes') {
-      rsvpNote.textContent = 'Thank you, ' + name + '. We look forward to celebrating with you in Sydney.';
-    } else {
-      rsvpNote.textContent = 'Thank you, ' + name + '. We truly appreciate your response and kind wishes.';
+    try {
+      isSubmitting = true;
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Sending...';
+      }
+
+      const response = await fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          attendance,
+          guests,
+          dietary,
+          message
+        })
+      });
+
+      if (response.ok === false) {
+        throw new Error('Failed to submit RSVP');
+      }
+
+      if (attendance === 'yes') {
+        rsvpNote.textContent = 'Thank you, ' + name + '. We look forward to celebrating with you in Sydney.';
+      } else {
+        rsvpNote.textContent = 'Thank you, ' + name + '. We truly appreciate your response and kind wishes.';
+      }
+
+      rsvpForm.reset();
+    } catch (_error) {
+      rsvpNote.textContent = 'Sorry, we could not save your RSVP right now. Please try again.';
+    } finally {
+      isSubmitting = false;
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Send RSVP';
+      }
     }
-
-    rsvpForm.reset();
   });
 }
 
