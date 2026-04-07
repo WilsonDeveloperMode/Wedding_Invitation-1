@@ -33,8 +33,8 @@
 
     <div class="hero-content reveal show">
       <p class="hero-kicker">Wedding Invitation</p>
-        <h1>Andrew Grove Koeswanto <span class="amp">&</span> <span class="no-break">Evelyn Hariono</span></h1>
-        <a class="hero-link hero-scroll" href="#details" aria-label="Scroll to wedding details">↓</a>
+      <h1>Andrew Grove Koeswanto <span class="amp">&</span> <span class="no-break">Evelyn Hariono</span></h1>
+      <a class="hero-link hero-scroll" href="#details" aria-label="Scroll to wedding details">↓</a>
     </div>
   </header>
 
@@ -96,7 +96,7 @@
         <h2>We would be honored by your presence</h2>
 
         <form class="rsvp-form" id="rsvpForm" novalidate
-          data-webhook-url="https://script.google.com/macros/s/AKfycbzQU2zAocNnXdRhquOsghtVSrarvvi8RQN-P5voIMg8HBKN3a7hut97BNJaU4IsSCvCZQ/exec">
+          data-webhook-url="https://script.google.com/macros/s/AKfycbxGsoy0_eJRyGwguhNqHvkc_9fY0P9hJZYICmnBMQiKg00HcwqRxyhCIcxd7d6UZ90qlQ/exec">
           <label>
             Guest Name
             <input type="text" name="name" required />
@@ -116,17 +116,15 @@
           <div class="invitees-block" id="inviteesBlock" hidden>
             <p class="invitees-title">Who is coming?</p>
             <p class="invitees-note" id="inviteesNote"></p>
-            <label>
-              Number attending
-              <select name="attendingCount" id="attendingCount"></select>
-            </label>
+            <div class="guest-stepper" aria-label="Number of guests attending">
+              <button type="button" class="guest-stepper-btn" id="guestCountMinus"
+                aria-label="Decrease guests">−</button>
+              <span class="guest-stepper-value" id="guestCountValue">1</span>
+              <button type="button" class="guest-stepper-btn" id="guestCountPlus"
+                aria-label="Increase guests">+</button>
+            </div>
             <div class="invitees-fields" id="inviteesFields"></div>
           </div>
-
-          <label>
-            Dietary Requirements
-            <input type="text" name="dietary" placeholder="Optional" />
-          </label>
 
           <label>
             Message

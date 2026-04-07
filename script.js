@@ -6,7 +6,9 @@ const rsvpNote = document.getElementById('rsvpNote');
 const inviteesBlock = document.getElementById('inviteesBlock');
 const inviteesFields = document.getElementById('inviteesFields');
 const inviteesNote = document.getElementById('inviteesNote');
-const attendingCountSelect = document.getElementById('attendingCount');
+const guestCountMinus = document.getElementById('guestCountMinus');
+const guestCountPlus = document.getElementById('guestCountPlus');
+const guestCountValue = document.getElementById('guestCountValue');
 const bgMusic = document.getElementById('bgMusic');
 const videoOpener = document.getElementById('videoOpener');
 const openerVideo = document.getElementById('openerVideo');
@@ -46,19 +48,28 @@ function getGuestNameFromUrl(index) {
   return '';
 }
 
-function createInviteeField(index, value) {
-  const wrapper = document.createElement('label');
-  const displayIndex = 'Guest ' + index;
+function createInviteeField(index, values) {
+  const name = (values.name || '').trim();
+  const dietry = (values.dietry || '').trim();
+  const isPrimary = index === 1;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'invitee-card';
   wrapper.innerHTML =
-    displayIndex +
-    '<input type="text" name="guest' +
+    '<p class="invitee-card-title">Person ' +
     index +
-    '" data-guest-field="true" autocomplete="name" />';
-  const input = wrapper.querySelector('input');
-  if (input) {
-    input.required = false;
-    input.value = value;
-  }
+    '</p>' +
+    '<label>Full Name<input type="text" name="guest' +
+    index +
+    '" data-guest-field="true" autocomplete="name"' +
+    (isPrimary ? ' readonly' : ' required') +
+    ' /></label>' +
+    '<label>Dietry Requirements<input type="text" name="guest' +
+    index +
+    'Dietry" data-guest-dietry-field="true" placeholder="Optional: vegetarian, allergies, etc." /></label>';
+  const nameInput = wrapper.querySelector('input[name="guest' + index + '"]');
+  const dietryInput = wrapper.querySelector('input[name="guest' + index + 'Dietry"]');
+  if (nameInput) nameInput.value = name;
+  if (dietryInput) dietryInput.value = dietry;
   return wrapper;
 }
 
@@ -68,9 +79,11 @@ function setupInviteeFields() {
     inviteesBlock === null ||
     inviteesFields === null ||
     inviteesNote === null ||
-    attendingCountSelect === null
+    guestCountMinus === null ||
+    guestCountPlus === null ||
+    guestCountValue === null
   ) {
-    return { inviteeLimit: 1, getSelectedCount: () => 1 };
+    return { inviteeLimit: 1, getSelectedCount: () => 1, setSelectedCount: () => {} };
   }
 
   const inviteeLimit = getInviteeLimitFromUrl();
@@ -78,52 +91,69 @@ function setupInviteeFields() {
   const primaryNameInput = rsvpForm.querySelector('input[name="name"]');
   const guestsInput = rsvpForm.querySelector('input[name="guests"]');
   const prefillByIndex = {};
-
-  for (let i = 2; i <= inviteeLimit; i += 1) {
-    prefillByIndex[i] = getGuestNameFromUrl(i);
-  }
-
-  if (inviteeLimit === 1) {
-    inviteesBlock.hidden = true;
-    if (guestsInput) guestsInput.value = '1';
-    return { inviteeLimit, getSelectedCount: () => 1 };
-  }
-
-  inviteesNote.textContent = 'This invitation allows up to ' + inviteeLimit + ' guests.';
-  attendingCountSelect.innerHTML = '';
+  let selectedCount = 1;
 
   for (let i = 1; i <= inviteeLimit; i += 1) {
-    const option = document.createElement('option');
-    option.value = String(i);
-    option.textContent = String(i);
-    attendingCountSelect.appendChild(option);
+    prefillByIndex[i] = {
+      name: getGuestNameFromUrl(i),
+      dietry: ''
+    };
   }
-  attendingCountSelect.value = '1';
+
+  inviteesNote.textContent =
+    inviteeLimit === 1
+      ? 'This invitation allows 1 guest.'
+      : 'This invitation allows up to ' + inviteeLimit + ' guests.';
+  guestCountValue.textContent = '1';
 
   const getSelectedCount = () => {
-    const selected = Number(attendingCountSelect.value);
-    if (Number.isFinite(selected) === false) return 1;
-    return Math.max(1, Math.min(inviteeLimit, Math.round(selected)));
+    return selectedCount;
+  };
+
+  const setSelectedCount = (nextCount) => {
+    selectedCount = Math.max(1, Math.min(inviteeLimit, Math.round(Number(nextCount) || 1)));
+    guestCountValue.textContent = String(selectedCount);
+    guestCountMinus.disabled = selectedCount <= 1;
+    guestCountPlus.disabled = selectedCount >= inviteeLimit;
   };
 
   const renderGuestFields = () => {
-    const previousValues = {};
-    const existingInputs = inviteesFields.querySelectorAll('input[data-guest-field="true"]');
-    existingInputs.forEach((input) => {
-      previousValues[input.name] = input.value;
+    const previousByIndex = {};
+    const existingNames = inviteesFields.querySelectorAll('input[data-guest-field="true"]');
+    const existingDietry = inviteesFields.querySelectorAll('input[data-guest-dietry-field="true"]');
+
+    existingNames.forEach((input) => {
+      const matched = input.name.match(/^guest(\d+)$/);
+      if (!matched) return;
+      const index = Number(matched[1]);
+      previousByIndex[index] = previousByIndex[index] || { name: '', dietry: '' };
+      previousByIndex[index].name = input.value;
+    });
+
+    existingDietry.forEach((input) => {
+      const matched = input.name.match(/^guest(\d+)Dietry$/);
+      if (!matched) return;
+      const index = Number(matched[1]);
+      previousByIndex[index] = previousByIndex[index] || { name: '', dietry: '' };
+      previousByIndex[index].dietry = input.value;
     });
 
     inviteesFields.innerHTML = '';
     const selectedCount = getSelectedCount();
 
-    for (let i = 2; i <= selectedCount; i += 1) {
-      const fieldName = 'guest' + i;
-      const fromPrevious = (previousValues[fieldName] || '').trim();
-      const fallback = (prefillByIndex[i] || '').trim();
-      const field = createInviteeField(i, fromPrevious || fallback);
-      const input = field.querySelector('input');
-      if (input) input.required = true;
-      inviteesFields.appendChild(field);
+    for (let i = 1; i <= selectedCount; i += 1) {
+      const fromPrevious = previousByIndex[i] || { name: '', dietry: '' };
+      const fallback = prefillByIndex[i] || { name: '', dietry: '' };
+      const resolvedName =
+        i === 1
+          ? ((primaryNameInput && primaryNameInput.value.trim()) || fallback.name || '')
+          : (fromPrevious.name || fallback.name || '');
+      inviteesFields.appendChild(
+        createInviteeField(i, {
+          name: resolvedName,
+          dietry: fromPrevious.dietry || fallback.dietry || ''
+        })
+      );
     }
   };
 
@@ -133,24 +163,34 @@ function setupInviteeFields() {
 
     if (isComing === false || hasPrimaryName === false) {
       inviteesBlock.hidden = true;
-      attendingCountSelect.disabled = true;
+      guestCountMinus.disabled = true;
+      guestCountPlus.disabled = true;
       const fields = inviteesFields.querySelectorAll('input[data-guest-field="true"]');
       fields.forEach((input) => {
         input.disabled = true;
         input.required = false;
+      });
+      const dietryFields = inviteesFields.querySelectorAll('input[data-guest-dietry-field="true"]');
+      dietryFields.forEach((input) => {
+        input.disabled = true;
       });
       if (guestsInput) guestsInput.value = '0';
       return;
     }
 
     inviteesBlock.hidden = false;
-    attendingCountSelect.disabled = false;
+    setSelectedCount(getSelectedCount());
     renderGuestFields();
 
     const fields = inviteesFields.querySelectorAll('input[data-guest-field="true"]');
     fields.forEach((input) => {
+      const isPrimaryGuest = input.name === 'guest1';
       input.disabled = false;
-      input.required = true;
+      input.required = isPrimaryGuest === false;
+    });
+    const dietryFields = inviteesFields.querySelectorAll('input[data-guest-dietry-field="true"]');
+    dietryFields.forEach((input) => {
+      input.disabled = false;
     });
 
     if (guestsInput) guestsInput.value = String(getSelectedCount());
@@ -162,13 +202,24 @@ function setupInviteeFields() {
   if (primaryNameInput) {
     primaryNameInput.addEventListener('input', updateInviteesState);
   }
-  attendingCountSelect.addEventListener('change', updateInviteesState);
+  guestCountMinus.addEventListener('click', () => {
+    if (guestCountMinus.disabled) return;
+    setSelectedCount(getSelectedCount() - 1);
+    updateInviteesState();
+  });
+  guestCountPlus.addEventListener('click', () => {
+    if (guestCountPlus.disabled) return;
+    setSelectedCount(getSelectedCount() + 1);
+    updateInviteesState();
+  });
 
   inviteesBlock.hidden = true;
-  attendingCountSelect.disabled = true;
+  setSelectedCount(1);
+  guestCountMinus.disabled = true;
+  guestCountPlus.disabled = true;
   if (guestsInput) guestsInput.value = '0';
 
-  return { inviteeLimit, getSelectedCount };
+  return { inviteeLimit, getSelectedCount, setSelectedCount };
 }
 
 function setupReveal() {
@@ -257,26 +308,8 @@ function setupRsvp() {
   const webhookUrl = (rsvpForm.dataset.webhookUrl || '').trim();
   const guestsInput = rsvpForm.querySelector('input[name="guests"]');
   const attendanceInput = rsvpForm.querySelector('select[name="attendance"]');
-  const dietaryInput = rsvpForm.querySelector('input[name="dietary"]');
-  const dietaryLabel = dietaryInput ? dietaryInput.closest('label') : null;
-  const { inviteeLimit, getSelectedCount } = setupInviteeFields();
+  const { inviteeLimit, getSelectedCount, setSelectedCount } = setupInviteeFields();
   let isSubmitting = false;
-
-  const updateDietaryState = () => {
-    if (!attendanceInput || !dietaryInput || !dietaryLabel) return;
-    const isDeclining = attendanceInput.value === 'no';
-    dietaryInput.disabled = isDeclining;
-    dietaryInput.required = false;
-    if (isDeclining) {
-      dietaryInput.value = '';
-    }
-    dietaryLabel.hidden = isDeclining;
-  };
-
-  if (attendanceInput) {
-    attendanceInput.addEventListener('change', updateDietaryState);
-    updateDietaryState();
-  }
 
   rsvpForm.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -291,7 +324,6 @@ function setupRsvp() {
     const data = new FormData(rsvpForm);
     const name = (data.get('name') || '').toString().trim();
     const attendance = (data.get('attendance') || '').toString().trim();
-    const dietary = (data.get('dietary') || '').toString().trim();
     const message = (data.get('message') || '').toString().trim();
 
     const selectedCount = attendance === 'yes' ? getSelectedCount() : 0;
@@ -299,11 +331,22 @@ function setupRsvp() {
     const guestsCount = attendance === 'yes' ? selectedCount : 0;
     if (guestsInput) guestsInput.value = String(guestsCount);
 
-    const normalizedGuestNames = [name];
-    for (let i = 2; i <= 4; i += 1) {
+    const normalizedGuestNames = [];
+    const normalizedGuestDietry = [];
+    for (let i = 1; i <= 4; i += 1) {
       const fieldValue = (data.get('guest' + i) || '').toString().trim();
-      normalizedGuestNames.push(fieldValue);
+      normalizedGuestNames.push(i === 1 ? name || fieldValue : fieldValue);
+      const dietryValue = (data.get('guest' + i + 'Dietry') || '').toString().trim();
+      normalizedGuestDietry.push(dietryValue);
     }
+
+    const dietarySummary = normalizedGuestDietry
+      .map((value, index) => {
+        if (!value) return '';
+        return 'Person ' + (index + 1) + ': ' + value;
+      })
+      .filter(Boolean)
+      .join(' | ');
 
     const payload = {
       submittedAt: new Date().toISOString(),
@@ -315,7 +358,16 @@ function setupRsvp() {
       guest2: normalizedGuestNames[1] || '',
       guest3: normalizedGuestNames[2] || '',
       guest4: normalizedGuestNames[3] || '',
-      dietary,
+      guest1Dietry: normalizedGuestDietry[0] || '',
+      guest2Dietry: normalizedGuestDietry[1] || '',
+      guest3Dietry: normalizedGuestDietry[2] || '',
+      guest4Dietry: normalizedGuestDietry[3] || '',
+      // Compatibility aliases for handlers using Dietary spelling
+      guest1Dietary: normalizedGuestDietry[0] || '',
+      guest2Dietary: normalizedGuestDietry[1] || '',
+      guest3Dietary: normalizedGuestDietry[2] || '',
+      guest4Dietary: normalizedGuestDietry[3] || '',
+      dietary: dietarySummary,
       message
     };
 
@@ -344,7 +396,7 @@ function setupRsvp() {
 
       rsvpForm.reset();
       if (guestsInput) guestsInput.value = '0';
-      if (attendingCountSelect) attendingCountSelect.value = '1';
+      setSelectedCount(1);
       if (attendanceInput) {
         attendanceInput.dispatchEvent(new Event('change'));
       }

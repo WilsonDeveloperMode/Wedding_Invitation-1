@@ -58,7 +58,7 @@ This app can save each RSVP to Google Sheets automatically using a Google Apps S
 
 Create a sheet with this header row in row 1:
 
-`Submitted At | Guest Name | Attendance | Attending Count | Invitee Limit | Guest 1 | Guest 2 | Guest 3 | Guest 4 | Dietary Requirements | Message`
+`Submitted At | Guest Name | Attendence | Attending Count | Invitee Limit | Guest 1 | Guest 1 Dietry | Guest 2 | Guest 2 Dietry | Guest 3 | Guest 3 Dietry | Guest 4 | Guest 4 Dietry | Message`
 
 ### 2. Create Apps Script webhook
 
@@ -66,22 +66,46 @@ In Google Sheet: `Extensions` -> `Apps Script`, then paste:
 
 ```javascript
 function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
-  var data = JSON.parse(e.postData.contents);
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = spreadsheet.getSheetByName('Sheet1') || spreadsheet.getActiveSheet();
+  var data = {};
 
-  sheet.appendRow([
-    data.submittedAt || '',
-    data.name || '',
-    data.attendance || '',
-    data.guests || '',
-    data.inviteeLimit || '',
-    data.guest1 || '',
-    data.guest2 || '',
-    data.guest3 || '',
-    data.guest4 || '',
-    data.dietary || '',
-    data.message || ''
-  ]);
+  try {
+    data = JSON.parse((e && e.postData && e.postData.contents) || '{}');
+  } catch (err) {
+    data = {};
+  }
+
+  var rawHeaders = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var normalizedToIndex = {};
+  for (var i = 0; i < rawHeaders.length; i++) {
+    var normalized = normalizeHeader(rawHeaders[i]);
+    if (normalized) normalizedToIndex[normalized] = i;
+  }
+
+  var out = new Array(rawHeaders.length).fill('');
+
+  function setByHeader(headerName, value) {
+    var idx = normalizedToIndex[normalizeHeader(headerName)];
+    if (typeof idx === 'number') out[idx] = value || '';
+  }
+
+  setByHeader('Submitted At', data.submittedAt || '');
+  setByHeader('Guest Name', data.name || '');
+  setByHeader('Attendence', data.attendance || '');
+  setByHeader('Attending Count', data.guests || '');
+  setByHeader('Invitee Limit', data.inviteeLimit || '');
+  setByHeader('Guest 1', data.guest1 || '');
+  setByHeader('Guest 1 Dietry', data.guest1Dietry || data.guest1Dietary || '');
+  setByHeader('Guest 2', data.guest2 || '');
+  setByHeader('Guest 2 Dietry', data.guest2Dietry || data.guest2Dietary || '');
+  setByHeader('Guest 3', data.guest3 || '');
+  setByHeader('Guest 3 Dietry', data.guest3Dietry || data.guest3Dietary || '');
+  setByHeader('Guest 4', data.guest4 || '');
+  setByHeader('Guest 4 Dietry', data.guest4Dietry || data.guest4Dietary || '');
+  setByHeader('Message', data.message || '');
+
+  sheet.appendRow(out);
 
   var lastRow = sheet.getLastRow();
   var lastCol = sheet.getLastColumn();
@@ -109,6 +133,14 @@ function doPost(e) {
   return ContentService
     .createTextOutput(JSON.stringify({ ok: true }))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function normalizeHeader(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[`"'’]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
 }
 
 function attendanceWeight(value) {

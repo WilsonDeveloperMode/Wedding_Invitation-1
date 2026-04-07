@@ -359,9 +359,62 @@ h2 {
   font-size: 0.86rem;
 }
 
+.guest-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 2px 0 12px;
+}
+
+.guest-stepper-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid rgba(166, 103, 52, 0.54);
+  background: rgba(255, 247, 235, 0.8);
+  color: #6f5138;
+  font-family: "Inter", sans-serif;
+  font-size: 1.14rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+}
+
+.guest-stepper-btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.guest-stepper-value {
+  min-width: 24px;
+  text-align: center;
+  font-family: "Bodoni Moda", serif;
+  font-size: 1.55rem;
+  line-height: 1;
+  color: #4f3927;
+}
+
 .invitees-fields {
   display: grid;
   gap: 10px;
+}
+
+.invitee-card {
+  border: 1px solid rgba(122, 84, 50, 0.2);
+  border-radius: 12px;
+  background: rgba(255, 250, 243, 0.66);
+  padding: 11px 10px;
+}
+
+.invitee-card-title {
+  margin: 0 0 8px;
+  color: #5f4630;
+  font-family: "Bodoni Moda", serif;
+  font-weight: 600;
+  font-size: 0.95rem;
 }
 
 .rsvp-form label {
