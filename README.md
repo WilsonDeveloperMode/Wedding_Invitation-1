@@ -58,7 +58,7 @@ This app can save each RSVP to Google Sheets automatically using a Google Apps S
 
 Create a sheet with this header row in row 1:
 
-`Submitted At | Guest Name | Attendance | Number of Guests | Dietary Requirements | Message`
+`Submitted At | Guest Name | Attendance | Attending Count | Invitee Limit | Guest 1 | Guest 2 | Guest 3 | Guest 4 | Dietary Requirements | Message`
 
 ### 2. Create Apps Script webhook
 
@@ -74,13 +74,66 @@ function doPost(e) {
     data.name || '',
     data.attendance || '',
     data.guests || '',
+    data.inviteeLimit || '',
+    data.guest1 || '',
+    data.guest2 || '',
+    data.guest3 || '',
+    data.guest4 || '',
     data.dietary || '',
     data.message || ''
   ]);
 
+  var lastRow = sheet.getLastRow();
+  var lastCol = sheet.getLastColumn();
+
+  // Ensure header filter exists.
+  var headerRange = sheet.getRange(1, 1, 1, lastCol);
+  if (!sheet.getFilter()) {
+    headerRange.createFilter();
+  }
+
+  // Sort rows: yes first, no last.
+  if (lastRow > 2) {
+    var dataRange = sheet.getRange(2, 1, lastRow - 1, lastCol);
+    var rows = dataRange.getValues();
+
+    rows.sort(function(a, b) {
+      return attendanceWeight(a[2]) - attendanceWeight(b[2]); // Attendance is col 3 (index 2)
+    });
+
+    dataRange.setValues(rows);
+  }
+
+  applyAttendanceColors(sheet);
+
   return ContentService
     .createTextOutput(JSON.stringify({ ok: true }))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function attendanceWeight(value) {
+  var status = String(value || '').toLowerCase().trim();
+  if (status === 'yes') return 0;
+  if (status === 'no') return 2;
+  return 1;
+}
+
+function applyAttendanceColors(sheet) {
+  var lastRow = sheet.getLastRow();
+  var lastCol = sheet.getLastColumn();
+  if (lastRow < 2) return;
+
+  var range = sheet.getRange(2, 1, lastRow - 1, lastCol);
+  var values = range.getValues();
+  var backgrounds = values.map(function(row) {
+    var status = String(row[2] || '').toLowerCase().trim(); // Attendance col
+    var color = '#FFFFFF';
+    if (status === 'yes') color = '#E6F4EA';
+    if (status === 'no') color = '#FCE8E6';
+    return new Array(lastCol).fill(color);
+  });
+
+  range.setBackgrounds(backgrounds);
 }
 ```
 

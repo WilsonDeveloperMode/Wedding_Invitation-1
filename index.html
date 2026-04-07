@@ -16,6 +16,15 @@
 </head>
 
 <body>
+  <div class="video-opener" id="videoOpener" role="button" tabindex="0" aria-label="Play opening video">
+    <video id="openerVideo" muted playsinline preload="auto">
+      <source src="assets/opener-video.mp4" type="video/mp4" />
+    </video>
+    <div class="video-opener-overlay" aria-hidden="true">
+      <p class="video-opener-instruction">Tap anywhere to begin</p>
+    </div>
+  </div>
+
   <header class="hero" id="top">
     <div class="hero-media parallax" data-speed="0.06" aria-hidden="true">
       <img src="assets/photo-portrait.jpg" alt="Andrew and Evelyn portrait" />
@@ -87,7 +96,7 @@
         <h2>We would be honored by your presence</h2>
 
         <form class="rsvp-form" id="rsvpForm" novalidate
-          data-webhook-url="https://script.google.com/macros/s/AKfycbzfVY2bS_31xgMqLYnX5lPSCk1Sq9bv8_33SfgeO-CkXm0M-DbP_wjvlNWaZFev1Udayg/exec">
+          data-webhook-url="https://script.google.com/macros/s/AKfycbzQU2zAocNnXdRhquOsghtVSrarvvi8RQN-P5voIMg8HBKN3a7hut97BNJaU4IsSCvCZQ/exec">
           <label>
             Guest Name
             <input type="text" name="name" required />
@@ -102,10 +111,17 @@
             </select>
           </label>
 
-          <label>
-            Number of Guests
-            <input type="number" name="guests" min="1" max="6" value="1" />
-          </label>
+          <input type="hidden" name="guests" value="1" />
+
+          <div class="invitees-block" id="inviteesBlock" hidden>
+            <p class="invitees-title">Who is coming?</p>
+            <p class="invitees-note" id="inviteesNote"></p>
+            <label>
+              Number attending
+              <select name="attendingCount" id="attendingCount"></select>
+            </label>
+            <div class="invitees-fields" id="inviteesFields"></div>
+          </div>
 
           <label>
             Dietary Requirements
@@ -133,6 +149,10 @@
   <footer class="footer">
     <p>With love, Andrew & Evelyn</p>
   </footer>
+
+  <audio id="bgMusic" preload="metadata" loop>
+    <source src="assets/lucky-theme.mp3" type="audio/mpeg" />
+  </audio>
 
   <script src="script.js"></script>
 </body>

@@ -40,16 +40,22 @@ async function ensureWorkbook() {
 
   if (!sheet) {
     sheet = workbook.addWorksheet('RSVPs');
-    sheet.columns = [
-      { header: 'Submitted At', key: 'submittedAt', width: 24 },
-      { header: 'Guest Name', key: 'name', width: 28 },
-      { header: 'Attendance', key: 'attendance', width: 16 },
-      { header: 'Number of Guests', key: 'guests', width: 18 },
-      { header: 'Dietary Requirements', key: 'dietary', width: 30 },
-      { header: 'Message', key: 'message', width: 46 }
-    ];
-    sheet.getRow(1).font = { bold: true };
   }
+
+  sheet.columns = [
+    { header: 'Submitted At', key: 'submittedAt', width: 24 },
+    { header: 'Guest Name', key: 'name', width: 28 },
+    { header: 'Attendance', key: 'attendance', width: 16 },
+    { header: 'Attending Count', key: 'guests', width: 18 },
+    { header: 'Invitee Limit', key: 'inviteeLimit', width: 16 },
+    { header: 'Guest 1', key: 'guest1', width: 24 },
+    { header: 'Guest 2', key: 'guest2', width: 24 },
+    { header: 'Guest 3', key: 'guest3', width: 24 },
+    { header: 'Guest 4', key: 'guest4', width: 24 },
+    { header: 'Dietary Requirements', key: 'dietary', width: 30 },
+    { header: 'Message', key: 'message', width: 46 }
+  ];
+  sheet.getRow(1).font = { bold: true };
 
   return { workbook, sheet };
 }
@@ -83,19 +89,36 @@ async function saveToGoogleSheets(payload) {
 
 app.post('/api/rsvp', async (req, res) => {
   try {
-    const { name, attendance, guests, dietary, message } = req.body;
+    const {
+      name,
+      attendance,
+      guests,
+      inviteeLimit,
+      guest1,
+      guest2,
+      guest3,
+      guest4,
+      dietary,
+      message
+    } = req.body;
 
     if (!name || !attendance) {
       return res.status(400).json({ error: 'Name and attendance are required.' });
     }
 
-    const guestsCount = Number(guests) || 1;
+    const parsedGuests = Number(guests);
+    const guestsCount = Number.isFinite(parsedGuests) ? Math.max(0, Math.round(parsedGuests)) : 1;
 
     const payload = {
       submittedAt: new Date().toISOString(),
       name: String(name).trim(),
       attendance: String(attendance).trim(),
       guests: guestsCount,
+      inviteeLimit: Math.min(4, Math.max(1, Number(inviteeLimit) || 1)),
+      guest1: String(guest1 || name || '').trim(),
+      guest2: String(guest2 || '').trim(),
+      guest3: String(guest3 || '').trim(),
+      guest4: String(guest4 || '').trim(),
       dietary: (dietary || '').toString().trim(),
       message: (message || '').toString().trim()
     };
@@ -146,8 +169,13 @@ app.get('/api/rsvp', requireAdminAccess, async (_req, res) => {
         name: row.getCell(2).value,
         attendance: row.getCell(3).value,
         guests: row.getCell(4).value,
-        dietary: row.getCell(5).value,
-        message: row.getCell(6).value
+        inviteeLimit: row.getCell(5).value,
+        guest1: row.getCell(6).value,
+        guest2: row.getCell(7).value,
+        guest3: row.getCell(8).value,
+        guest4: row.getCell(9).value,
+        dietary: row.getCell(10).value,
+        message: row.getCell(11).value
       });
     });
 
