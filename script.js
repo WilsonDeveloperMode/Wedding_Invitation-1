@@ -12,6 +12,12 @@ const guestCountValue = document.getElementById('guestCountValue');
 const bgMusic = document.getElementById('bgMusic');
 const videoOpener = document.getElementById('videoOpener');
 const openerVideo = document.getElementById('openerVideo');
+const galleryCarousel = document.getElementById('galleryCarousel');
+const galleryTrack = document.getElementById('galleryTrack');
+const galleryViewport = document.getElementById('galleryViewport');
+const galleryPrev = document.getElementById('galleryPrev');
+const galleryNext = document.getElementById('galleryNext');
+const galleryDots = document.getElementById('galleryDots');
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const userAgent = navigator.userAgent || '';
@@ -597,6 +603,100 @@ function setupMusicPlayer() {
   window.addEventListener('pageshow', resumeMusicOnReturn);
 }
 
+function setupGalleryCarousel() {
+  if (
+    galleryCarousel === null ||
+    galleryTrack === null ||
+    galleryViewport === null ||
+    galleryPrev === null ||
+    galleryNext === null ||
+    galleryDots === null
+  ) {
+    return;
+  }
+
+  const slides = Array.from(galleryTrack.querySelectorAll('.gallery-slide'));
+  if (slides.length === 0) return;
+
+  let currentIndex = 0;
+  let startX = 0;
+  let deltaX = 0;
+  const swipeThreshold = 48;
+
+  const dots = slides.map((_slide, index) => {
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'gallery-dot';
+    dot.setAttribute('aria-label', 'Go to photo ' + (index + 1));
+    dot.addEventListener('click', () => {
+      goToSlide(index);
+    });
+    galleryDots.appendChild(dot);
+    return dot;
+  });
+
+  const updateCarousel = () => {
+    galleryTrack.style.transform = 'translate3d(' + (-currentIndex * 100) + '%,0,0)';
+    dots.forEach((dot, index) => {
+      const isActive = index === currentIndex;
+      dot.classList.toggle('is-active', isActive);
+      dot.setAttribute('aria-current', isActive ? 'true' : 'false');
+    });
+  };
+
+  const goToSlide = (index) => {
+    currentIndex = (index + slides.length) % slides.length;
+    updateCarousel();
+  };
+
+  galleryPrev.addEventListener('click', () => {
+    goToSlide(currentIndex - 1);
+  });
+
+  galleryNext.addEventListener('click', () => {
+    goToSlide(currentIndex + 1);
+  });
+
+  galleryViewport.addEventListener(
+    'touchstart',
+    (event) => {
+      startX = event.touches[0].clientX;
+      deltaX = 0;
+    },
+    { passive: true }
+  );
+
+  galleryViewport.addEventListener(
+    'touchmove',
+    (event) => {
+      deltaX = event.touches[0].clientX - startX;
+    },
+    { passive: true }
+  );
+
+  galleryViewport.addEventListener('touchend', () => {
+    if (Math.abs(deltaX) < swipeThreshold) return;
+    if (deltaX < 0) {
+      goToSlide(currentIndex + 1);
+    } else {
+      goToSlide(currentIndex - 1);
+    }
+  });
+
+  galleryCarousel.setAttribute('tabindex', '0');
+  galleryCarousel.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      goToSlide(currentIndex + 1);
+    } else if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      goToSlide(currentIndex - 1);
+    }
+  });
+
+  updateCarousel();
+}
+
 function setupVideoOpener() {
   if (videoOpener === null) return;
 
@@ -715,6 +815,7 @@ function setupVideoOpener() {
 setupReveal();
 setupParallax();
 setupHeroScrollMotion();
+setupGalleryCarousel();
 setupRsvp();
 setupMusicPlayer();
 setupVideoOpener();

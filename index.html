@@ -6,12 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Andrew & Evelyn | Wedding Invitation</title>
   <meta name="description"
-    content="A modern wedding invitation and RSVP page for Andrew Grove Koeswanto and Evelyn Hariono in Sydney, Australia." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600;6..96,700&family=Inter:wght@400;500;600&display=swap"
-    rel="stylesheet" />
+    content="A modern wedding invitation and RSVP page for Andrew Koeswanto and Evelyn Hariono in Sydney, Australia." />
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -32,8 +27,8 @@
     <div class="hero-overlay" aria-hidden="true"></div>
 
     <div class="hero-content reveal show">
-      <p class="hero-kicker">Wedding Invitation</p>
-      <h1>Andrew Grove Koeswanto <span class="amp">&</span> <span class="no-break">Evelyn Hariono</span></h1>
+      <p class="hero-kicker">The Wedding Invitation Of</p>
+      <h1>Andrew Koeswanto <span class="amp">&</span> <span class="no-break">Evelyn Hariono</span></h1>
       <a class="hero-link hero-scroll" href="#details" aria-label="Scroll to wedding details">↓</a>
     </div>
   </header>
@@ -79,13 +74,32 @@
           <h2>Moments we will always remember</h2>
         </article>
 
-        <div class="gallery-grid">
-          <figure class="gallery-item gallery-large reveal parallax" data-speed="0.04">
-            <img src="assets/photo-embrace.jpg" alt="Andrew and Evelyn embracing by the lake" />
-          </figure>
-          <figure class="gallery-item reveal">
-            <img src="assets/photo-night-proposal.jpg" alt="Evening portrait in Sydney" />
-          </figure>
+        <div class="gallery-carousel reveal" id="galleryCarousel" aria-label="Photo gallery carousel">
+          <button class="gallery-nav gallery-nav-prev" type="button" id="galleryPrev" aria-label="Previous photo">←</button>
+          <div class="gallery-viewport" id="galleryViewport">
+            <div class="gallery-track" id="galleryTrack">
+              <figure class="gallery-slide">
+                <img src="assets/photo-embrace.jpg" alt="Andrew and Evelyn embracing by the lake" loading="lazy" />
+              </figure>
+              <figure class="gallery-slide">
+                <img src="assets/photo-night-proposal.jpg" alt="Evening portrait in Sydney" loading="lazy" />
+              </figure>
+              <figure class="gallery-slide">
+                <img src="assets/photo-walk.jpg" alt="Andrew and Evelyn walking together" loading="lazy" />
+              </figure>
+              <figure class="gallery-slide">
+                <img src="assets/photo-memory-3.jpg" alt="A candid memory of Andrew and Evelyn" loading="lazy" />
+              </figure>
+              <figure class="gallery-slide">
+                <img src="assets/photo-memory-6.jpg" alt="A joyful moment from Andrew and Evelyn's memories" loading="lazy" />
+              </figure>
+              <figure class="gallery-slide">
+                <img src="assets/photo-memory-9.jpg" alt="Romantic portrait of Andrew and Evelyn" loading="lazy" />
+              </figure>
+            </div>
+          </div>
+          <button class="gallery-nav gallery-nav-next" type="button" id="galleryNext" aria-label="Next photo">→</button>
+          <div class="gallery-dots" id="galleryDots" aria-label="Select photo"></div>
         </div>
       </div>
     </section>
