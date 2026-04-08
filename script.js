@@ -14,6 +14,13 @@ const videoOpener = document.getElementById('videoOpener');
 const openerVideo = document.getElementById('openerVideo');
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const userAgent = navigator.userAgent || '';
+const isIOSDevice =
+  /iP(hone|ad|od)/.test(userAgent) ||
+  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isSafariBrowser =
+  /Safari/.test(userAgent) && /CriOS|FxiOS|EdgiOS|OPiOS/.test(userAgent) === false;
+const useIosSafariAudioFallback = isIOSDevice && isSafariBrowser;
 
 function clampInviteeCount(value) {
   const count = Number(value);
@@ -442,10 +449,58 @@ function setupRsvp() {
 function setupMusicPlayer() {
   if (bgMusic === null) return;
   let shouldResumeOnReturn = false;
+  let resumePrompt = null;
+
+  const ensureResumePrompt = () => {
+    if (useIosSafariAudioFallback === false) return null;
+    if (resumePrompt) return resumePrompt;
+
+    resumePrompt = document.createElement('button');
+    resumePrompt.type = 'button';
+    resumePrompt.textContent = 'Tap to resume music';
+    resumePrompt.setAttribute('aria-live', 'polite');
+    resumePrompt.style.position = 'fixed';
+    resumePrompt.style.left = '50%';
+    resumePrompt.style.bottom = '16px';
+    resumePrompt.style.transform = 'translateX(-50%)';
+    resumePrompt.style.padding = '12px 16px';
+    resumePrompt.style.border = 'none';
+    resumePrompt.style.borderRadius = '999px';
+    resumePrompt.style.background = 'rgba(30, 30, 30, 0.92)';
+    resumePrompt.style.color = '#fff';
+    resumePrompt.style.fontSize = '14px';
+    resumePrompt.style.lineHeight = '1';
+    resumePrompt.style.zIndex = '2000';
+    resumePrompt.style.cursor = 'pointer';
+    resumePrompt.style.display = 'none';
+
+    resumePrompt.addEventListener('click', async () => {
+      try {
+        await bgMusic.play();
+      } catch (_error) {
+        // Keep prompt visible if browser still blocks playback.
+      }
+    });
+
+    document.body.appendChild(resumePrompt);
+    return resumePrompt;
+  };
+
+  const showResumePrompt = () => {
+    const prompt = ensureResumePrompt();
+    if (!prompt) return;
+    prompt.style.display = 'block';
+  };
+
+  const hideResumePrompt = () => {
+    if (!resumePrompt) return;
+    resumePrompt.style.display = 'none';
+  };
 
   const pauseMusicForBackground = () => {
     if (bgMusic.paused) return;
     shouldResumeOnReturn = true;
+    hideResumePrompt();
     bgMusic.pause();
   };
 
@@ -454,13 +509,16 @@ function setupMusicPlayer() {
     try {
       await bgMusic.play();
       shouldResumeOnReturn = false;
+      hideResumePrompt();
     } catch (_error) {
-      // Ignore if browser blocks autoplay resume.
+      // iOS Safari often blocks this; show a one-tap resume prompt.
+      showResumePrompt();
     }
   };
 
   bgMusic.addEventListener('play', () => {
     shouldResumeOnReturn = false;
+    hideResumePrompt();
   });
 
   document.addEventListener('visibilitychange', () => {
@@ -589,10 +647,15 @@ function setupVideoOpener() {
     window.setTimeout(() => {
       document.body.classList.remove('opener-locked');
     }, 0);
+    return;
   }
 
   resetToBeginning();
-  window.addEventListener('pageshow', resetToBeginning);
+  window.addEventListener('pageshow', (event) => {
+    // Safari fires pageshow on initial load too; only reset when page is restored from bfcache.
+    if (!event.persisted) return;
+    resetToBeginning();
+  });
 }
 
 setupReveal();
