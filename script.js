@@ -305,7 +305,7 @@ function setupHeroScrollMotion() {
 function setupRsvp() {
   if (rsvpForm === null || rsvpNote === null) return;
   const submitButton = rsvpForm.querySelector('button[type="submit"]');
-  const webhookUrl = (rsvpForm.dataset.webhookUrl || '').trim();
+  const submitUrl = ((rsvpForm.dataset.webhookUrl || '/api/rsvp').trim() || '/api/rsvp');
   const guestsInput = rsvpForm.querySelector('input[name="guests"]');
   const attendanceInput = rsvpForm.querySelector('select[name="attendance"]');
   const { inviteeLimit, getSelectedCount, setSelectedCount } = setupInviteeFields();
@@ -334,6 +334,12 @@ function setupRsvp() {
     const normalizedGuestNames = [];
     const normalizedGuestDietry = [];
     for (let i = 1; i <= 4; i += 1) {
+      if (attendance !== 'yes' || i > guestsCount) {
+        normalizedGuestNames.push('');
+        normalizedGuestDietry.push('');
+        continue;
+      }
+
       const fieldValue = (data.get('guest' + i) || '').toString().trim();
       normalizedGuestNames.push(i === 1 ? name || fieldValue : fieldValue);
       const dietryValue = (data.get('guest' + i + 'Dietry') || '').toString().trim();
@@ -372,7 +378,7 @@ function setupRsvp() {
     };
 
     try {
-      if (webhookUrl === '') {
+      if (submitUrl === '') {
         throw new Error('Missing RSVP webhook URL.');
       }
 
@@ -382,14 +388,34 @@ function setupRsvp() {
         submitButton.textContent = 'Sending...';
       }
 
-      await fetch(webhookUrl, {
+      const response = await fetch(submitUrl, {
         method: 'POST',
-        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify(payload)
       });
 
-      if (attendance === 'yes') {
-        rsvpNote.textContent = 'Thank you, ' + name + '. We look forward to celebrating with you in Sydney.';
+      let responseData = null;
+      try {
+        responseData = await response.json();
+      } catch (_error) {
+        responseData = null;
+      }
+
+      if (!response.ok) {
+        const errorMessage =
+          (responseData && responseData.error) ||
+          'Sorry, we could not save your RSVP right now. Please try again.';
+        throw new Error(errorMessage);
+      }
+
+      if (responseData && responseData.cloudEnabled === false) {
+        rsvpNote.textContent =
+          'Your RSVP was saved, but Google Sheets sync is not enabled on the server yet.';
+      } else if (attendance === 'yes') {
+        rsvpNote.textContent =
+          'Thank you, ' + name + '. We look forward to celebrating with you in Sydney.';
       } else {
         rsvpNote.textContent = 'Thank you, ' + name + '. We truly appreciate your response and kind wishes.';
       }
@@ -400,8 +426,9 @@ function setupRsvp() {
       if (attendanceInput) {
         attendanceInput.dispatchEvent(new Event('change'));
       }
-    } catch (_error) {
-      rsvpNote.textContent = 'Sorry, we could not save your RSVP right now. Please try again.';
+    } catch (error) {
+      rsvpNote.textContent =
+        (error && error.message) || 'Sorry, we could not save your RSVP right now. Please try again.';
     } finally {
       isSubmitting = false;
       if (submitButton) {
@@ -414,6 +441,40 @@ function setupRsvp() {
 
 function setupMusicPlayer() {
   if (bgMusic === null) return;
+  let shouldResumeOnReturn = false;
+
+  const pauseMusicForBackground = () => {
+    if (bgMusic.paused) return;
+    shouldResumeOnReturn = true;
+    bgMusic.pause();
+  };
+
+  const resumeMusicOnReturn = async () => {
+    if (!shouldResumeOnReturn || document.hidden) return;
+    try {
+      await bgMusic.play();
+      shouldResumeOnReturn = false;
+    } catch (_error) {
+      // Ignore if browser blocks autoplay resume.
+    }
+  };
+
+  bgMusic.addEventListener('play', () => {
+    shouldResumeOnReturn = false;
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      pauseMusicForBackground();
+      return;
+    }
+    resumeMusicOnReturn();
+  });
+
+  window.addEventListener('blur', pauseMusicForBackground);
+  window.addEventListener('pagehide', pauseMusicForBackground);
+  window.addEventListener('focus', resumeMusicOnReturn);
+  window.addEventListener('pageshow', resumeMusicOnReturn);
 }
 
 function setupVideoOpener() {

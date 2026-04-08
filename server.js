@@ -77,11 +77,25 @@ async function saveToGoogleSheets(payload) {
     body: JSON.stringify(payload)
   });
 
+  const rawBody = await response.text();
+
   if (!response.ok) {
-    const errorBody = await response.text();
     throw new Error(
-      'Google Sheets webhook failed with status ' + response.status + ': ' + errorBody
+      'Google Sheets webhook failed with status ' + response.status + ': ' + rawBody
     );
+  }
+
+  // Some Apps Script handlers return HTTP 200 with { ok: false, error: "..." }.
+  // Surface that as a real error so the frontend doesn't show false success.
+  let parsedBody = null;
+  try {
+    parsedBody = JSON.parse(rawBody);
+  } catch (_error) {
+    parsedBody = null;
+  }
+
+  if (parsedBody && parsedBody.ok === false) {
+    throw new Error(parsedBody.error || 'Google Sheets webhook reported failure.');
   }
 
   return { enabled: true };
@@ -98,6 +112,14 @@ app.post('/api/rsvp', async (req, res) => {
       guest2,
       guest3,
       guest4,
+      guest1Dietry,
+      guest2Dietry,
+      guest3Dietry,
+      guest4Dietry,
+      guest1Dietary,
+      guest2Dietary,
+      guest3Dietary,
+      guest4Dietary,
       dietary,
       message
     } = req.body;
@@ -119,6 +141,15 @@ app.post('/api/rsvp', async (req, res) => {
       guest2: String(guest2 || '').trim(),
       guest3: String(guest3 || '').trim(),
       guest4: String(guest4 || '').trim(),
+      guest1Dietry: String(guest1Dietry || guest1Dietary || '').trim(),
+      guest2Dietry: String(guest2Dietry || guest2Dietary || '').trim(),
+      guest3Dietry: String(guest3Dietry || guest3Dietary || '').trim(),
+      guest4Dietry: String(guest4Dietry || guest4Dietary || '').trim(),
+      // Compatibility aliases for handlers using Dietary spelling
+      guest1Dietary: String(guest1Dietary || guest1Dietry || '').trim(),
+      guest2Dietary: String(guest2Dietary || guest2Dietry || '').trim(),
+      guest3Dietary: String(guest3Dietary || guest3Dietry || '').trim(),
+      guest4Dietary: String(guest4Dietary || guest4Dietry || '').trim(),
       dietary: (dietary || '').toString().trim(),
       message: (message || '').toString().trim()
     };
