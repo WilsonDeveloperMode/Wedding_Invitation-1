@@ -48,14 +48,14 @@
 }
 
 :root {
-  --bg: #f2e6d4;
-  --bg-soft: #e9d9c1;
-  --ink: #3d2b1b;
-  --muted: #725740;
-  --line: rgba(91, 66, 41, 0.22);
-  --card: rgba(250, 240, 224, 0.86);
-  --card-border: rgba(124, 88, 55, 0.26);
-  --accent: #a36a3b;
+  --bg: #1e1b19;          /* Cod Gray */
+  --bg-soft: #6d4f3e;     /* Tobacco Brown */
+  --ink: #c0b3a5;         /* Malta */
+  --muted: #b79f87;
+  --line: rgba(192, 179, 165, 0.28);
+  --card: rgba(30, 27, 25, 0.82);
+  --card-border: rgba(166, 137, 112, 0.48);
+  --accent: #d2b79d;
   --max: 1080px;
 }
 
@@ -73,7 +73,7 @@ body {
   margin: 0;
   font-family: "Cantarell", sans-serif;
   color: var(--ink);
-  background: linear-gradient(180deg, #f7edde 0%, #eddcc3 40%, #e5cfb1 100%);
+  background: linear-gradient(180deg, #1e1b19 0%, #6d4f3e 60%, #c0b3a5 100%);
   line-height: 1.6;
   width: 100%;
   max-width: 100%;
@@ -126,7 +126,7 @@ body.opener-locked footer {
 
 .video-opener-instruction {
   margin: 0;
-  color: #f6e7d1;
+  color: #c0b3a5;
   text-transform: uppercase;
   letter-spacing: 0.14em;
   font-size: 0.75rem;
@@ -218,9 +218,9 @@ h3 {
   inset: 0;
   opacity: var(--hero-overlay-opacity, 1);
   background:
-    linear-gradient(90deg, rgba(62, 40, 22, 0.56) 0%, rgba(62, 40, 22, 0.38) 36%, rgba(62, 40, 22, 0.1) 64%, rgba(62, 40, 22, 0) 82%),
-    radial-gradient(70% 58% at 50% 22%, rgba(179, 126, 69, 0.13) 0%, rgba(179, 126, 69, 0) 72%),
-    linear-gradient(180deg, rgba(45, 28, 15, 0.18) 0%, rgba(45, 28, 15, 0.38) 68%, rgba(45, 28, 15, 0.52) 100%);
+    linear-gradient(90deg, rgba(30, 27, 25, 0.64) 0%, rgba(30, 27, 25, 0.42) 40%, rgba(30, 27, 25, 0.12) 67%, rgba(30, 27, 25, 0) 84%),
+    radial-gradient(70% 58% at 50% 22%, rgba(192, 179, 165, 0.18) 0%, rgba(192, 179, 165, 0) 72%),
+    linear-gradient(180deg, rgba(30, 27, 25, 0.22) 0%, rgba(30, 27, 25, 0.44) 68%, rgba(30, 27, 25, 0.58) 100%);
 }
 
 .hero-content {
@@ -236,29 +236,29 @@ h3 {
 }
 
 .hero-kicker {
-  margin: 0;
+  margin: 0 0 0;
   text-transform: uppercase;
   letter-spacing: 0.16em;
   font-size: 0.88rem;
   font-family: "Cantarell", sans-serif;
-  color: #e6d1bb;
+  color: var(--ink);
   text-shadow: 0 2px 10px rgba(26, 16, 9, 0.65);
 }
 
 .hero h1 {
-  margin: 12px 0 8px;
+  margin: 0 0 8px;
   max-width: 760px;
   line-height: 1.02;
   font-size: clamp(2.05rem, 5.7vw, 3.75rem);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.015em;
-  color: #f7ecde;
+  color: var(--ink);
   text-shadow: 0 2px 12px rgba(22, 13, 7, 0.68), 0 10px 28px rgba(22, 13, 7, 0.38);
 }
 
 .hero h1 .amp {
-  color: #d9a067;
+  color: var(--muted);
   font-weight: 500;
 }
 
@@ -268,7 +268,7 @@ h3 {
 
 .hero-subtitle {
   margin: 0;
-  color: #e1c8ae;
+  color: var(--muted);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-size: 0.92rem;
@@ -280,7 +280,7 @@ h3 {
   margin-top: 22px;
   padding: 0;
   border: none;
-  color: #f0dbc3;
+  color: var(--ink);
   text-decoration: none;
   font-size: 2.1rem;
   line-height: 1;
@@ -336,7 +336,7 @@ h2 {
 }
 
 .details {
-  background: linear-gradient(180deg, rgba(241, 226, 202, 0.88) 0%, rgba(232, 211, 182, 0.95) 100%);
+  background: linear-gradient(180deg, rgba(30, 27, 25, 0.94) 0%, rgba(38, 34, 31, 0.97) 100%);
 }
 
 .details-grid {
@@ -366,17 +366,18 @@ h2 {
 
 .detail-card h3 {
   margin: 0 0 6px;
-  font-size: 1.87rem;
+  font-size: 1.375rem;
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.01em;
+  letter-spacing: 0;
+  word-spacing: -0.04em;
   line-height: 1.03;
-  color: #3d2b1b;
+  color: var(--ink);
 }
 
 .detail-card p:not(.detail-date) {
   margin: 0;
-  color: #5c4938;
+  color: var(--ink);
   font-size: 1.12rem;
   letter-spacing: 0.015em;
 }
@@ -391,7 +392,7 @@ h2 {
 }
 
 .gallery {
-  background: radial-gradient(circle at 50% 18%, rgba(163, 106, 59, 0.13), transparent 58%);
+  background: radial-gradient(circle at 50% 18%, rgba(192, 179, 165, 0.18), transparent 58%);
 }
 
 .gallery-copy {
@@ -406,8 +407,8 @@ h2 {
 .gallery-viewport {
   overflow: hidden;
   border-radius: 16px;
-  border: 1px solid rgba(124, 88, 55, 0.27);
-  background: #eedcbe;
+  border: 1px solid rgba(166, 137, 112, 0.42);
+  background: rgba(30, 27, 25, 0.88);
   touch-action: pan-y;
 }
 
@@ -438,9 +439,9 @@ h2 {
   width: 42px;
   height: 42px;
   border-radius: 999px;
-  border: 1px solid rgba(124, 88, 55, 0.55);
-  background: rgba(245, 233, 215, 0.84);
-  color: #5a3f27;
+  border: 1px solid rgba(192, 179, 165, 0.58);
+  background: rgba(30, 27, 25, 0.9);
+  color: var(--ink);
   font-family: "Corporate A Pro", sans-serif;
   font-size: 1.25rem;
   line-height: 1;
@@ -467,18 +468,18 @@ h2 {
   width: 9px;
   height: 9px;
   border-radius: 999px;
-  border: 1px solid rgba(104, 72, 45, 0.6);
-  background: rgba(255, 245, 230, 0.5);
+  border: 1px solid rgba(192, 179, 165, 0.65);
+  background: rgba(109, 79, 62, 0.62);
   padding: 0;
   cursor: pointer;
 }
 
 .gallery-dot.is-active {
-  background: rgba(145, 95, 54, 0.92);
+  background: rgba(210, 183, 157, 0.95);
 }
 
 .rsvp {
-  background: linear-gradient(180deg, rgba(238, 223, 198, 0.9) 0%, rgba(227, 206, 174, 0.96) 100%);
+  background: linear-gradient(180deg, rgba(30, 27, 25, 0.93) 0%, rgba(38, 34, 31, 0.97) 100%);
 }
 
 .rsvp-form {
@@ -488,15 +489,15 @@ h2 {
 }
 
 .invitees-block {
-  border: 1px solid rgba(122, 84, 50, 0.33);
-  background: rgba(248, 236, 217, 0.64);
+  border: 1px solid rgba(166, 137, 112, 0.46);
+  background: rgba(30, 27, 25, 0.74);
   border-radius: 12px;
   padding: 12px;
 }
 
 .invitees-title {
   margin: 0;
-  color: #5b4531;
+  color: var(--ink);
   font-weight: 600;
   font-size: 0.95rem;
 }
@@ -518,9 +519,9 @@ h2 {
   width: 36px;
   height: 36px;
   border-radius: 999px;
-  border: 1px solid rgba(166, 103, 52, 0.54);
-  background: rgba(255, 247, 235, 0.8);
-  color: #6f5138;
+  border: 1px solid rgba(166, 137, 112, 0.54);
+  background: rgba(30, 27, 25, 0.9);
+  color: var(--ink);
   font-family: "Cantarell", sans-serif;
   font-size: 1.14rem;
   line-height: 1;
@@ -542,7 +543,7 @@ h2 {
   font-family: "Corporate A Pro", sans-serif;
   font-size: 1.55rem;
   line-height: 1;
-  color: #4f3927;
+  color: var(--ink);
 }
 
 .invitees-fields {
@@ -551,15 +552,15 @@ h2 {
 }
 
 .invitee-card {
-  border: 1px solid rgba(122, 84, 50, 0.2);
+  border: 1px solid rgba(166, 137, 112, 0.34);
   border-radius: 12px;
-  background: rgba(255, 250, 243, 0.66);
+  background: rgba(30, 27, 25, 0.7);
   padding: 11px 10px;
 }
 
 .invitee-card-title {
   margin: 0 0 8px;
-  color: #5f4630;
+  color: var(--ink);
   font-family: "Corporate A Pro", sans-serif;
   font-weight: 500;
   font-size: 0.95rem;
@@ -569,7 +570,7 @@ h2 {
   display: grid;
   gap: 7px;
   font-size: 0.92rem;
-  color: #5f4d3b;
+  color: var(--ink);
 }
 
 .rsvp-form label[hidden] {
@@ -580,29 +581,29 @@ h2 {
 .rsvp-form select,
 .rsvp-form textarea {
   width: 100%;
-  border: 1px solid rgba(122, 84, 50, 0.38);
+  border: 1px solid rgba(166, 137, 112, 0.4);
   border-radius: 10px;
   padding: 11px 12px;
   font: inherit;
   color: var(--ink);
-  background: rgba(248, 238, 221, 0.76);
+  background: rgba(30, 27, 25, 0.88);
 }
 
 .rsvp-form input:focus,
 .rsvp-form select:focus,
 .rsvp-form textarea:focus {
-  outline: 1px solid rgba(166, 103, 52, 0.65);
-  border-color: rgba(166, 103, 52, 0.65);
+  outline: 1px solid rgba(210, 183, 157, 0.82);
+  border-color: rgba(210, 183, 157, 0.82);
 }
 
 .rsvp-form button {
   margin-top: 4px;
-  border: 1px solid rgba(166, 103, 52, 0.7);
+  border: 1px solid rgba(210, 183, 157, 0.72);
   border-radius: 999px;
   padding: 11px 16px;
   font: inherit;
-  color: #4f3a27;
-  background: rgba(166, 103, 52, 0.2);
+  color: var(--ink);
+  background: rgba(109, 79, 62, 0.6);
   cursor: pointer;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -611,7 +612,7 @@ h2 {
 }
 
 .rsvp-form button:hover {
-  background: rgba(166, 103, 52, 0.3);
+  background: rgba(109, 79, 62, 0.78);
   transform: translateY(-1px);
 }
 
@@ -633,7 +634,7 @@ h2 {
 
 .closing-wrap p {
   margin: 0;
-  color: #594632;
+  color: #1e1b19;
   font-family: "Corporate A Pro", sans-serif;
   font-size: clamp(1.35rem, 3.2vw, 2rem);
   line-height: 1.2;
@@ -644,7 +645,7 @@ h2 {
   border-top: 1px solid var(--line);
   text-align: center;
   padding: 26px 16px 34px;
-  color: var(--muted);
+  color: #1e1b19;
   letter-spacing: 0.01em;
   font-size: 0.86rem;
   text-transform: uppercase;
@@ -682,9 +683,9 @@ h2 {
 
   .hero-overlay {
     background:
-      linear-gradient(90deg, rgba(62, 40, 22, 0.36) 0%, rgba(62, 40, 22, 0.2) 38%, rgba(62, 40, 22, 0.06) 64%, rgba(62, 40, 22, 0) 82%),
-      radial-gradient(70% 58% at 50% 22%, rgba(179, 126, 69, 0.1) 0%, rgba(179, 126, 69, 0) 72%),
-      linear-gradient(180deg, rgba(45, 28, 15, 0.1) 0%, rgba(45, 28, 15, 0.28) 68%, rgba(45, 28, 15, 0.42) 100%);
+      linear-gradient(90deg, rgba(30, 27, 25, 0.42) 0%, rgba(30, 27, 25, 0.24) 38%, rgba(30, 27, 25, 0.08) 64%, rgba(30, 27, 25, 0) 82%),
+      radial-gradient(70% 58% at 50% 22%, rgba(192, 179, 165, 0.14) 0%, rgba(192, 179, 165, 0) 72%),
+      linear-gradient(180deg, rgba(30, 27, 25, 0.14) 0%, rgba(30, 27, 25, 0.3) 68%, rgba(30, 27, 25, 0.46) 100%);
   }
 
   .hero-content {
