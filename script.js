@@ -395,13 +395,41 @@ function setupRsvp() {
         submitButton.textContent = 'Sending...';
       }
 
-      const response = await fetch(submitUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
+      const submitCandidates = [submitUrl];
+      if (submitUrl === '/api/rsvp') {
+        submitCandidates.push('/.netlify/functions/rsvp');
+      }
+
+      let response = null;
+      let lastSubmitError = null;
+
+      for (const endpoint of submitCandidates) {
+        try {
+          const candidateResponse = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          });
+
+          // Retry next endpoint only for hard endpoint issues.
+          if (candidateResponse.status === 404 || candidateResponse.status === 405) {
+            response = candidateResponse;
+            continue;
+          }
+
+          response = candidateResponse;
+          lastSubmitError = null;
+          break;
+        } catch (error) {
+          lastSubmitError = error;
+        }
+      }
+
+      if (response === null) {
+        throw lastSubmitError || new Error('Could not reach RSVP endpoint.');
+      }
 
       let responseData = null;
       try {
