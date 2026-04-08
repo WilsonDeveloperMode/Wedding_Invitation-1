@@ -313,6 +313,7 @@ function setupRsvp() {
   if (rsvpForm === null || rsvpNote === null) return;
   const submitButton = rsvpForm.querySelector('button[type="submit"]');
   const submitUrl = ((rsvpForm.dataset.webhookUrl || '/api/rsvp').trim() || '/api/rsvp');
+  const directGoogleWebhookUrl = (rsvpForm.dataset.googleWebhookUrl || '').trim();
   const guestsInput = rsvpForm.querySelector('input[name="guests"]');
   const attendanceInput = rsvpForm.querySelector('select[name="attendance"]');
   const { inviteeLimit, getSelectedCount, setSelectedCount } = setupInviteeFields();
@@ -428,7 +429,21 @@ function setupRsvp() {
       }
 
       if (response === null) {
-        throw lastSubmitError || new Error('Could not reach RSVP endpoint.');
+        // Final fallback for static hosting (e.g. Netlify) when API/function endpoint is unavailable.
+        if (directGoogleWebhookUrl) {
+          await fetch(directGoogleWebhookUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify(payload)
+          });
+          response = {
+            ok: true,
+            status: 200,
+            json: async () => ({ ok: true, cloudEnabled: true, viaDirectWebhook: true })
+          };
+        } else {
+          throw lastSubmitError || new Error('Could not reach RSVP endpoint.');
+        }
       }
 
       let responseData = null;
@@ -629,7 +644,7 @@ function setupVideoOpener() {
     hasStarted = true;
     videoOpener.classList.add('is-playing');
 
-    if (openerVideo === null) {
+    if (openerVideo === null || prefersReducedMotion) {
       await finishTransition();
       return;
     }
@@ -669,14 +684,6 @@ function setupVideoOpener() {
     event.preventDefault();
     onTap();
   });
-
-  if (prefersReducedMotion) {
-    videoOpener.classList.add('is-hidden');
-    window.setTimeout(() => {
-      document.body.classList.remove('opener-locked');
-    }, 0);
-    return;
-  }
 
   resetToBeginning();
   window.addEventListener('pageshow', (event) => {
