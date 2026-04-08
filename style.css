@@ -184,8 +184,7 @@ h3 {
 }
 
 .hero-kicker,
-.section-label,
-.detail-date {
+.section-label {
   font-family: "Corporate A Pro", sans-serif;
 }
 
@@ -241,6 +240,7 @@ h3 {
   text-transform: uppercase;
   letter-spacing: 0.16em;
   font-size: 0.88rem;
+  font-family: "Cantarell", sans-serif;
   color: #e6d1bb;
   text-shadow: 0 2px 10px rgba(26, 16, 9, 0.65);
 }
@@ -355,26 +355,34 @@ h2 {
 }
 
 .detail-date {
-  margin: 0;
+  margin: 0 0 8px;
   color: var(--accent);
   text-transform: none;
-  letter-spacing: 0.05em;
-  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  font-size: 0.9rem;
+  font-family: "Cantarell", sans-serif;
+  line-height: 1.18;
 }
 
 .detail-card h3 {
-  margin: 8px 0 4px;
-  font-size: 1.95rem;
+  margin: 0 0 6px;
+  font-size: 1.87rem;
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
+  line-height: 1.03;
+  color: #3d2b1b;
 }
 
-.detail-card p {
+.detail-card p:not(.detail-date) {
   margin: 0;
   color: #5c4938;
-  font-size: 1.06rem;
-  letter-spacing: 0.01em;
+  font-size: 1.12rem;
+  letter-spacing: 0.015em;
+}
+
+.detail-card h3 + p {
+  margin-top: 0;
 }
 
 .detail-card p + p {
@@ -629,6 +637,7 @@ h2 {
   font-family: "Corporate A Pro", sans-serif;
   font-size: clamp(1.35rem, 3.2vw, 2rem);
   line-height: 1.2;
+  font-weight: 400;
 }
 
 .footer {
