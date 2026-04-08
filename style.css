@@ -58,10 +58,10 @@ body.opener-locked footer {
   height: 100%;
   object-fit: cover;
   pointer-events: none;
-  filter: sepia(0.22) saturate(0.9) contrast(1.04) brightness(0.98);
-  transform: scale(1.04);
+  filter: contrast(1.02) saturate(1.02);
+  transform: scale(1.01);
   transform-origin: center;
-  transition: filter 1.2s ease;
+  transition: filter 0.8s ease, transform 0.8s ease;
 }
 
 .video-opener-overlay {
@@ -90,14 +90,14 @@ body.opener-locked footer {
 }
 
 .video-opener.is-playing video {
-  animation: openerDreamZoom 8.5s ease-out forwards;
+  animation: openerDreamZoom 9s ease-out forwards;
 }
 
 .video-opener.is-transitioning video,
 .video-opener.is-transitioning .video-opener-image {
-  transform: scale(1.2);
-  filter: sepia(0.3) saturate(0.82) contrast(1.06) blur(4px) brightness(0.92);
-  transition: transform 1.6s ease, filter 1.6s ease;
+  transform: scale(1.26);
+  filter: contrast(1.06) saturate(1.06) brightness(0.92) blur(4.5px);
+  transition: transform 1.5s ease, filter 1.5s ease;
 }
 
 .video-opener.is-transitioning .video-opener-overlay {
@@ -114,16 +114,16 @@ body.opener-locked footer {
 
 @keyframes openerDreamZoom {
   0% {
-    transform: scale(1.04);
-    filter: sepia(0.22) saturate(0.9) contrast(1.04) brightness(0.98);
+    transform: scale(1.02);
+    filter: contrast(1.03) saturate(1.03);
   }
   60% {
-    transform: scale(1.1);
-    filter: sepia(0.28) saturate(0.86) contrast(1.05) brightness(0.95);
+    transform: scale(1.12);
+    filter: contrast(1.04) saturate(1.04) blur(1.3px);
   }
   100% {
-    transform: scale(1.14);
-    filter: sepia(0.32) saturate(0.82) contrast(1.06) brightness(0.92);
+    transform: scale(1.2);
+    filter: contrast(1.05) saturate(1.05) brightness(0.94) blur(2.8px);
   }
 }
 
