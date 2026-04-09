@@ -603,6 +603,20 @@ function setupMusicPlayer() {
   window.addEventListener('pageshow', resumeMusicOnReturn);
 }
 
+function setupAutoGrowMessage() {
+  if (rsvpForm === null) return;
+  const messageField = rsvpForm.querySelector('textarea[name="message"]');
+  if (messageField === null) return;
+
+  const resizeMessageField = () => {
+    messageField.style.height = 'auto';
+    messageField.style.height = messageField.scrollHeight + 'px';
+  };
+
+  messageField.addEventListener('input', resizeMessageField);
+  resizeMessageField();
+}
+
 function setupGalleryCarousel() {
   if (
     galleryCarousel === null ||
@@ -816,6 +830,7 @@ setupReveal();
 setupParallax();
 setupHeroScrollMotion();
 setupGalleryCarousel();
+setupAutoGrowMessage();
 setupRsvp();
 setupMusicPlayer();
 setupVideoOpener();
