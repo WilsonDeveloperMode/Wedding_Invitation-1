@@ -7,12 +7,12 @@
   <title>Andrew & Evelyn | Wedding Invitation</title>
   <meta name="description"
     content="A modern wedding invitation and RSVP page for Andrew Koeswanto and Evelyn Hariono in Sydney, Australia." />
-  <link rel="stylesheet" href="style.css?v=20260409-12" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body class="opener-locked">
   <div class="video-opener" id="videoOpener" role="button" tabindex="0" aria-label="Play opening video">
-    <video id="openerVideo" muted playsinline preload="auto" poster="assets/opener-cover.jpeg">
+    <video id="openerVideo" muted playsinline preload="auto" poster="assets/opener-envelope.png">
       <source src="assets/opener-fantasy.mp4" type="video/mp4" />
     </video>
     <div class="video-opener-overlay" aria-hidden="true">
@@ -22,7 +22,7 @@
 
   <header class="hero" id="top">
     <div class="hero-media parallax" data-speed="0.06" aria-hidden="true">
-      <img src="assets/photo-portrait.jpg" alt="Andrew and Evelyn portrait" />
+      <img src="assets/rsvp/05-lake-embrace.jpg" alt="Andrew and Evelyn embracing by the lake" />
     </div>
     <div class="hero-overlay" aria-hidden="true"></div>
 
@@ -48,15 +48,19 @@
           <article class="detail-card reveal">
             <p class="detail-date">October 20, 2026</p>
             <h3>Holy Matrimony</h3>
-            <p>3:00 PM to 4:00 PM</p>
-            <p>St Mary’s Cathedral</p>
+            <div class="detail-meta">
+              <p class="detail-time">3:00 PM to 4:00 PM</p>
+              <p class="detail-location">St Mary's Cathedral</p>
+            </div>
           </article>
 
           <article class="detail-card reveal">
             <p class="detail-date">October 20, 2026</p>
             <h3>Reception</h3>
-            <p>6:30 PM onwards</p>
-            <p>Bennelong, Sydney Opera House</p>
+            <div class="detail-meta">
+              <p class="detail-time">6:30 PM onwards</p>
+              <p class="detail-location">Bennelong, Sydney Opera House</p>
+            </div>
           </article>
 
           <article class="detail-card reveal">
@@ -74,34 +78,28 @@
           <h2>Moments we will always remember</h2>
         </article>
 
-        <div class="gallery-carousel reveal" id="galleryCarousel" aria-label="Photo gallery carousel">
-          <button class="gallery-nav gallery-nav-prev" type="button" id="galleryPrev"
-            aria-label="Previous photo">←</button>
-          <div class="gallery-viewport" id="galleryViewport">
-            <div class="gallery-track" id="galleryTrack">
-              <figure class="gallery-slide">
-                <img src="assets/photo-embrace.jpg" alt="Andrew and Evelyn embracing by the lake" loading="lazy" />
-              </figure>
-              <figure class="gallery-slide">
-                <img src="assets/photo-night-proposal.jpg" alt="Evening portrait in Sydney" loading="lazy" />
-              </figure>
-              <figure class="gallery-slide">
-                <img src="assets/photo-walk.jpg" alt="Andrew and Evelyn walking together" loading="lazy" />
-              </figure>
-              <figure class="gallery-slide">
-                <img src="assets/photo-memory-3.jpg" alt="A candid memory of Andrew and Evelyn" loading="lazy" />
-              </figure>
-              <figure class="gallery-slide">
-                <img src="assets/photo-memory-6.jpg" alt="A joyful moment from Andrew and Evelyn's memories"
-                  loading="lazy" />
-              </figure>
-              <figure class="gallery-slide">
-                <img src="assets/photo-memory-9.jpg" alt="Romantic portrait of Andrew and Evelyn" loading="lazy" />
-              </figure>
-            </div>
-          </div>
-          <button class="gallery-nav gallery-nav-next" type="button" id="galleryNext" aria-label="Next photo">→</button>
-          <div class="gallery-dots" id="galleryDots" aria-label="Select photo"></div>
+        <div class="gallery-scroll reveal" aria-label="Photo gallery">
+          <figure class="gallery-card">
+            <img src="assets/rsvp/02-yosemite-valley.jpg" alt="Andrew and Evelyn at Yosemite valley" loading="lazy" />
+          </figure>
+          <figure class="gallery-card">
+            <img src="assets/rsvp/01-city-night.jpg" alt="Andrew and Evelyn portrait at night" loading="lazy" />
+          </figure>
+          <figure class="gallery-card">
+            <img src="assets/rsvp/06-proposal-night.jpg" alt="A proposal moment by the lake" loading="lazy" />
+          </figure>
+          <figure class="gallery-card">
+            <img src="assets/rsvp/04-winery.jpg" alt="Andrew and Evelyn at the winery" loading="lazy" />
+          </figure>
+          <figure class="gallery-card">
+            <img src="assets/rsvp/03-yosemite-reflection-upright.jpg" alt="Andrew and Evelyn by the reflection lake" loading="lazy" />
+          </figure>
+          <figure class="gallery-card">
+            <img src="assets/rsvp/07-graduation.jpeg" alt="A graduation celebration memory" loading="lazy" />
+          </figure>
+          <figure class="gallery-card">
+            <img src="assets/rsvp/08-garden.jpg" alt="Andrew and Evelyn in a garden walkway" loading="lazy" />
+          </figure>
         </div>
       </div>
     </section>
@@ -110,6 +108,9 @@
       <div class="container narrow reveal">
         <p class="section-label">RSVP</p>
         <h2>We would be honored by your presence</h2>
+        <p class="rsvp-policy">We're delighted to host you for our destination wedding. We will provide 3 nights
+          of hotel accommodation and local transportation during the wedding celebrations. Guests are kindly asked to
+          arrange and cover their own airfare.</p>
 
         <form class="rsvp-form" id="rsvpForm" novalidate data-webhook-url="/api/rsvp"
           data-google-webhook-url="https://script.google.com/macros/s/AKfycbyoDM5iWujRnymL37qgRsL19XMFLJbwTZlijuWvlrRftjeGJmAfF4dgD6KQrousuxUneg/exec">
@@ -165,10 +166,10 @@
   </footer>
 
   <audio id="bgMusic" preload="metadata" loop>
-    <source src="assets/lucky-theme.mp3" type="audio/mpeg" />
+    <source src="assets/Fernando Wilson - Perfect (Instrumental) - (128 Kbps).mp3" type="audio/mpeg" />
   </audio>
 
-  <script src="script.js?v=20260409-12"></script>
+  <script src="script.js"></script>
 </body>
 
 </html>

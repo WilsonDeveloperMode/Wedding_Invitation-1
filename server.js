@@ -10,9 +10,23 @@ const port = process.env.PORT || 3000;
 const workbookPath = path.join(__dirname, 'data', 'rsvp-data.xlsx');
 const googleSheetsWebhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL || '';
 const rsvpAdminKey = process.env.RSVP_ADMIN_KEY || '';
+const isDevelopment = process.env.NODE_ENV !== 'production';
 
 app.use(express.json());
-app.use(express.static(__dirname));
+app.use(
+  express.static(__dirname, {
+    etag: !isDevelopment,
+    lastModified: !isDevelopment,
+    maxAge: isDevelopment ? 0 : '1d',
+    setHeaders: (res) => {
+      if (isDevelopment) {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+      }
+    }
+  })
+);
 
 function requireAdminAccess(req, res, next) {
   const headerKey = req.headers['x-admin-key'];
