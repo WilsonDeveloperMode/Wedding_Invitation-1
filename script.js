@@ -826,10 +826,139 @@ function setupVideoOpener() {
   });
 }
 
+function setupPhotoRoll() {
+  const photoRoll = document.querySelector('.gallery-scroll');
+  const prevButton = document.querySelector('.gallery-arrow-prev');
+  const nextButton = document.querySelector('.gallery-arrow-next');
+  if (photoRoll === null || prevButton === null || nextButton === null) return;
+
+  const cards = Array.from(photoRoll.querySelectorAll('.gallery-card'));
+  const totalCards = cards.length;
+  if (totalCards === 0) return;
+
+  let activeIndex = Math.floor(totalCards / 2);
+  let motionTimer = null;
+
+  const normalizeIndex = (index) => {
+    return ((index % totalCards) + totalCards) % totalCards;
+  };
+
+  const getRenderedContentWidth = (card, scale) => {
+    if (card === null) return 0;
+    const image = card.querySelector('img');
+    const cardWidth = card.clientWidth;
+    const cardHeight = card.clientHeight;
+    if (image === null || cardWidth <= 0 || cardHeight <= 0) return cardWidth * scale;
+
+    const naturalWidth = image.naturalWidth;
+    const naturalHeight = image.naturalHeight;
+    if (naturalWidth <= 0 || naturalHeight <= 0) return cardWidth * scale;
+
+    const fitScale = Math.min(cardWidth / naturalWidth, cardHeight / naturalHeight);
+    const containedWidth = naturalWidth * fitScale;
+    return containedWidth * scale;
+  };
+
+  const updateVisibleGapSpacing = () => {
+    const centerCard = photoRoll.querySelector('.gallery-card[data-position="center"]');
+    const leftCard = photoRoll.querySelector('.gallery-card[data-position="left"]');
+    const rightCard = photoRoll.querySelector('.gallery-card[data-position="right"]');
+    if (centerCard === null || leftCard === null || rightCard === null) return;
+
+    const styles = window.getComputedStyle(photoRoll);
+    const sideScale = parseFloat(styles.getPropertyValue('--gallery-side-scale')) || 0.6;
+    const gap = parseFloat(styles.getPropertyValue('--gallery-gap')) || 24;
+
+    const centerWidth = getRenderedContentWidth(centerCard, 1);
+    const leftWidth = getRenderedContentWidth(leftCard, sideScale);
+    const rightWidth = getRenderedContentWidth(rightCard, sideScale);
+
+    const leftShift = (centerWidth * 0.5) + (leftWidth * 0.5) + gap;
+    const rightShift = (centerWidth * 0.5) + (rightWidth * 0.5) + gap;
+
+    photoRoll.style.setProperty('--gallery-left-shift', '-' + leftShift.toFixed(2) + 'px');
+    photoRoll.style.setProperty('--gallery-right-shift', rightShift.toFixed(2) + 'px');
+  };
+
+  const updatePositions = () => {
+    cards.forEach((card, index) => {
+      const leftIndex = normalizeIndex(activeIndex - 1);
+      const rightIndex = normalizeIndex(activeIndex + 1);
+
+      let position = 'hidden-right';
+      if (index === activeIndex) {
+        position = 'center';
+      } else if (index === leftIndex) {
+        position = 'left';
+      } else if (index === rightIndex) {
+        position = 'right';
+      } else if (
+        index < activeIndex ||
+        (activeIndex === 0 && index === totalCards - 1)
+      ) {
+        position = 'hidden-left';
+      }
+
+      card.setAttribute('data-position', position);
+    });
+    updateVisibleGapSpacing();
+  };
+
+  const goToNext = () => {
+    photoRoll.classList.remove('is-rotating-prev', 'is-rotating-next');
+    // Restart class to retrigger keyframes on each click.
+    void photoRoll.offsetWidth;
+    photoRoll.classList.add('is-rotating-next');
+    window.clearTimeout(motionTimer);
+    motionTimer = window.setTimeout(() => {
+      photoRoll.classList.remove('is-rotating-next');
+    }, 480);
+    activeIndex = normalizeIndex(activeIndex + 1);
+    updatePositions();
+  };
+
+  const goToPrevious = () => {
+    photoRoll.classList.remove('is-rotating-prev', 'is-rotating-next');
+    // Restart class to retrigger keyframes on each click.
+    void photoRoll.offsetWidth;
+    photoRoll.classList.add('is-rotating-prev');
+    window.clearTimeout(motionTimer);
+    motionTimer = window.setTimeout(() => {
+      photoRoll.classList.remove('is-rotating-prev');
+    }, 480);
+    activeIndex = normalizeIndex(activeIndex - 1);
+    updatePositions();
+  };
+
+  prevButton.addEventListener('click', goToPrevious);
+  nextButton.addEventListener('click', goToNext);
+  photoRoll.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      goToPrevious();
+    }
+    if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      goToNext();
+    }
+  });
+
+  window.addEventListener('resize', updateVisibleGapSpacing);
+  cards.forEach((card) => {
+    const image = card.querySelector('img');
+    if (image === null) return;
+    if (image.complete) return;
+    image.addEventListener('load', updateVisibleGapSpacing, { once: true });
+  });
+
+  updatePositions();
+}
+
 setupReveal();
 setupParallax();
 setupHeroScrollMotion();
 setupGalleryCarousel();
+setupPhotoRoll();
 setupAutoGrowMessage();
 setupRsvp();
 setupMusicPlayer();
