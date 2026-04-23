@@ -830,7 +830,8 @@ function setupPhotoRoll() {
   const photoRoll = document.querySelector('.gallery-scroll');
   const prevButton = document.querySelector('.gallery-arrow-prev');
   const nextButton = document.querySelector('.gallery-arrow-next');
-  if (photoRoll === null || prevButton === null || nextButton === null) return;
+  if (photoRoll === null) return;
+  const galleryRoll = photoRoll.closest('.gallery-roll');
 
   const cards = Array.from(photoRoll.querySelectorAll('.gallery-card'));
   const totalCards = cards.length;
@@ -838,6 +839,19 @@ function setupPhotoRoll() {
 
   let activeIndex = Math.floor(totalCards / 2);
   let motionTimer = null;
+  let isAnimating = false;
+  let isDragging = false;
+  let didDragNavigate = false;
+  let dragResetTimer = null;
+  let autoAdvanceTimer = null;
+  let resumeAutoTimer = null;
+  let touchStartX = 0;
+  let touchDeltaX = 0;
+  const swipeThreshold = 34;
+  const autoAdvanceDelay = 4000;
+  const motionDuration = 1500;
+  const dragInfluence = 0.34;
+  const dragSnapDuration = 340;
 
   const normalizeIndex = (index) => {
     return ((index % totalCards) + totalCards) % totalCards;
@@ -882,20 +896,17 @@ function setupPhotoRoll() {
 
   const updatePositions = () => {
     cards.forEach((card, index) => {
-      const leftIndex = normalizeIndex(activeIndex - 1);
-      const rightIndex = normalizeIndex(activeIndex + 1);
+      const forwardDistance = (index - activeIndex + totalCards) % totalCards;
+      const backwardDistance = (activeIndex - index + totalCards) % totalCards;
 
       let position = 'hidden-right';
-      if (index === activeIndex) {
+      if (forwardDistance === 0) {
         position = 'center';
-      } else if (index === leftIndex) {
-        position = 'left';
-      } else if (index === rightIndex) {
+      } else if (forwardDistance === 1) {
         position = 'right';
-      } else if (
-        index < activeIndex ||
-        (activeIndex === 0 && index === totalCards - 1)
-      ) {
+      } else if (forwardDistance === totalCards - 1) {
+        position = 'left';
+      } else if (backwardDistance < forwardDistance) {
         position = 'hidden-left';
       }
 
@@ -905,42 +916,150 @@ function setupPhotoRoll() {
   };
 
   const goToNext = () => {
-    photoRoll.classList.remove('is-rotating-prev', 'is-rotating-next');
-    // Restart class to retrigger keyframes on each click.
-    void photoRoll.offsetWidth;
-    photoRoll.classList.add('is-rotating-next');
-    window.clearTimeout(motionTimer);
-    motionTimer = window.setTimeout(() => {
-      photoRoll.classList.remove('is-rotating-next');
-    }, 480);
+    if (isAnimating) return;
+    isAnimating = true;
     activeIndex = normalizeIndex(activeIndex + 1);
     updatePositions();
+    window.clearTimeout(motionTimer);
+    motionTimer = window.setTimeout(() => {
+      isAnimating = false;
+    }, motionDuration);
   };
 
   const goToPrevious = () => {
-    photoRoll.classList.remove('is-rotating-prev', 'is-rotating-next');
-    // Restart class to retrigger keyframes on each click.
-    void photoRoll.offsetWidth;
-    photoRoll.classList.add('is-rotating-prev');
-    window.clearTimeout(motionTimer);
-    motionTimer = window.setTimeout(() => {
-      photoRoll.classList.remove('is-rotating-prev');
-    }, 480);
+    if (isAnimating) return;
+    isAnimating = true;
     activeIndex = normalizeIndex(activeIndex - 1);
     updatePositions();
+    window.clearTimeout(motionTimer);
+    motionTimer = window.setTimeout(() => {
+      isAnimating = false;
+    }, motionDuration);
   };
 
-  prevButton.addEventListener('click', goToPrevious);
-  nextButton.addEventListener('click', goToNext);
+  const stopAutoAdvance = () => {
+    if (autoAdvanceTimer !== null) {
+      window.clearInterval(autoAdvanceTimer);
+      autoAdvanceTimer = null;
+    }
+    if (resumeAutoTimer !== null) {
+      window.clearTimeout(resumeAutoTimer);
+      resumeAutoTimer = null;
+    }
+  };
+
+  const startAutoAdvance = () => {
+    if (document.hidden || autoAdvanceTimer !== null) return;
+    autoAdvanceTimer = window.setInterval(() => {
+      goToNext();
+    }, autoAdvanceDelay);
+  };
+
+  const restartAutoAdvanceWithDelay = () => {
+    stopAutoAdvance();
+    startAutoAdvance();
+  };
+
+  const onTouchStart = (event) => {
+    if (event.touches.length !== 1) return;
+    stopAutoAdvance();
+    isDragging = true;
+    didDragNavigate = false;
+    window.clearTimeout(dragResetTimer);
+    photoRoll.style.transition = 'none';
+    touchStartX = event.touches[0].clientX;
+    touchDeltaX = 0;
+  };
+
+  const onTouchMove = (event) => {
+    if (event.touches.length !== 1 || isDragging === false) return;
+    const currentX = event.touches[0].clientX;
+    touchDeltaX = currentX - touchStartX;
+    photoRoll.style.transform = 'translate3d(' + (touchDeltaX * dragInfluence).toFixed(2) + 'px, 0, 0)';
+
+    // Allow continuous swipe progression while finger is still down.
+    if (touchDeltaX <= -swipeThreshold && isAnimating === false) {
+      didDragNavigate = true;
+      goToNext();
+      restartAutoAdvanceWithDelay();
+      touchStartX = currentX;
+      touchDeltaX = 0;
+      photoRoll.style.transform = 'translate3d(0, 0, 0)';
+      return;
+    }
+
+    if (touchDeltaX >= swipeThreshold && isAnimating === false) {
+      didDragNavigate = true;
+      goToPrevious();
+      restartAutoAdvanceWithDelay();
+      touchStartX = currentX;
+      touchDeltaX = 0;
+      photoRoll.style.transform = 'translate3d(0, 0, 0)';
+    }
+  };
+
+  const onTouchEnd = () => {
+    if (isDragging === false) return;
+    isDragging = false;
+    photoRoll.style.transition = 'transform ' + dragSnapDuration + 'ms cubic-bezier(0.22, 1, 0.36, 1)';
+    photoRoll.style.transform = 'translate3d(0, 0, 0)';
+    window.clearTimeout(dragResetTimer);
+    dragResetTimer = window.setTimeout(() => {
+      photoRoll.style.transition = '';
+    }, dragSnapDuration + 20);
+
+    // Always resume autoplay after any touch interaction, even if it was just
+    // a hold/scroll and not a swipe navigation.
+    restartAutoAdvanceWithDelay();
+
+    if (didDragNavigate) return;
+    if (Math.abs(touchDeltaX) < swipeThreshold) return;
+    if (touchDeltaX < 0) {
+      goToNext();
+    } else {
+      goToPrevious();
+    }
+  };
+
+  if (prevButton !== null) {
+    prevButton.addEventListener('click', () => {
+      goToPrevious();
+      restartAutoAdvanceWithDelay();
+    });
+  }
+  if (nextButton !== null) {
+    nextButton.addEventListener('click', () => {
+      goToNext();
+      restartAutoAdvanceWithDelay();
+    });
+  }
   photoRoll.addEventListener('keydown', (event) => {
     if (event.key === 'ArrowLeft') {
       event.preventDefault();
       goToPrevious();
+      restartAutoAdvanceWithDelay();
     }
     if (event.key === 'ArrowRight') {
       event.preventDefault();
       goToNext();
+      restartAutoAdvanceWithDelay();
     }
+  });
+  photoRoll.addEventListener('touchstart', onTouchStart, { passive: true });
+  photoRoll.addEventListener('touchmove', onTouchMove, { passive: true });
+  photoRoll.addEventListener('touchend', onTouchEnd);
+  photoRoll.addEventListener('touchcancel', onTouchEnd);
+
+  photoRoll.addEventListener('mouseenter', stopAutoAdvance);
+  photoRoll.addEventListener('mouseleave', startAutoAdvance);
+  photoRoll.addEventListener('focusin', stopAutoAdvance);
+  photoRoll.addEventListener('focusout', startAutoAdvance);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stopAutoAdvance();
+      return;
+    }
+    startAutoAdvance();
   });
 
   window.addEventListener('resize', updateVisibleGapSpacing);
@@ -951,7 +1070,51 @@ function setupPhotoRoll() {
     image.addEventListener('load', updateVisibleGapSpacing, { once: true });
   });
 
+  const updateEntryProgress = () => {
+    if (galleryRoll === null || prefersReducedMotion) {
+      photoRoll.style.setProperty('--entry-progress', '1');
+      return;
+    }
+
+    const rect = galleryRoll.getBoundingClientRect();
+    const vh = window.innerHeight || document.documentElement.clientHeight || 1;
+    const start = vh * 0.9;
+    const end = vh * 0.3;
+    const raw = (start - rect.top) / (start - end);
+    const progress = Math.min(1, Math.max(0, raw));
+    photoRoll.style.setProperty('--entry-progress', progress.toFixed(3));
+  };
+
+  let entryTicking = false;
+  const requestEntryProgress = () => {
+    if (entryTicking) return;
+    entryTicking = true;
+    window.requestAnimationFrame(() => {
+      updateEntryProgress();
+      entryTicking = false;
+    });
+  };
+
   updatePositions();
+  updateEntryProgress();
+  window.addEventListener('scroll', requestEntryProgress, { passive: true });
+  window.addEventListener('resize', requestEntryProgress);
+  if (galleryRoll !== null && 'IntersectionObserver' in window) {
+    const autoPlayObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            startAutoAdvance();
+          } else {
+            stopAutoAdvance();
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+    autoPlayObserver.observe(galleryRoll);
+  }
+  startAutoAdvance();
 }
 
 setupReveal();

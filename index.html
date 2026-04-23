@@ -7,6 +7,9 @@
   <title>Andrew & Evelyn | Wedding Invitation</title>
   <meta name="description"
     content="A modern wedding invitation and RSVP page for Andrew Koeswanto and Evelyn Hariono in Sydney, Australia." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Allura&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -27,10 +30,14 @@
     <div class="hero-overlay" aria-hidden="true"></div>
 
     <div class="hero-content reveal show">
-      <p class="hero-kicker">The Wedding Invitation Of</p>
-      <h1>Andrew Koeswanto <span class="amp">&</span> <span class="no-break">Evelyn Hariono</span></h1>
-      <a class="hero-link hero-scroll" href="#details" aria-label="Scroll to wedding details">↓</a>
+      <h1>
+        <span class="hero-name hero-chip">Andrew Koeswanto</span>
+        <span class="hero-name amp hero-chip">&amp;</span>
+        <span class="hero-name hero-chip no-break">Evelyn Hariono<span class="hero-apostrophe">’</span>s</span>
+      </h1>
+      <p class="hero-subtitle">Wedding RSVP</p>
     </div>
+    <a class="hero-link hero-scroll" href="#details" aria-label="Scroll to wedding details">↓</a>
   </header>
 
   <main>
@@ -45,21 +52,21 @@
             <h3>Welcome Dinner</h3>
           </article>
 
-          <article class="detail-card reveal">
+          <article class="detail-card detail-card-day reveal">
             <p class="detail-date">October 20, 2026</p>
-            <h3>Holy Matrimony</h3>
-            <div class="detail-meta">
-              <p class="detail-time">3:00 PM to 4:00 PM</p>
-              <p class="detail-location">St Mary's Cathedral</p>
+            <div class="detail-event">
+              <h3>Holy Matrimony</h3>
+              <div class="detail-meta">
+                <p class="detail-time">3:00 PM to 4:00 PM</p>
+                <p class="detail-location">St Mary's Cathedral</p>
+              </div>
             </div>
-          </article>
-
-          <article class="detail-card reveal">
-            <p class="detail-date">October 20, 2026</p>
-            <h3>Reception</h3>
-            <div class="detail-meta">
-              <p class="detail-time">6:30 PM onwards</p>
-              <p class="detail-location">Bennelong, Sydney Opera House</p>
+            <div class="detail-event">
+              <h3>Reception</h3>
+              <div class="detail-meta">
+                <p class="detail-time">6:30 PM onwards</p>
+                <p class="detail-location">Bennelong, Sydney Opera House</p>
+              </div>
             </div>
           </article>
 
@@ -79,31 +86,29 @@
         </article>
 
         <div class="gallery-roll reveal" aria-label="Photo gallery">
-          <button class="gallery-arrow gallery-arrow-prev" type="button" aria-label="Previous photo">‹</button>
           <div class="gallery-scroll" tabindex="0" aria-label="Photo gallery carousel">
             <figure class="gallery-card">
-              <img src="assets/rsvp/02-yosemite-valley.jpg" alt="Andrew and Evelyn at Yosemite valley" loading="lazy" />
+              <img src="Rsvp Pics/photo urut/1.jpg" alt="Gallery photo 1" loading="lazy" />
             </figure>
             <figure class="gallery-card">
-              <img src="assets/rsvp/01-city-night.jpg" alt="Andrew and Evelyn portrait at night" loading="lazy" />
+              <img src="Rsvp Pics/photo urut/2.jpeg" alt="Gallery photo 2" loading="lazy" />
             </figure>
             <figure class="gallery-card">
-              <img src="assets/rsvp/06-proposal-night.jpg" alt="A proposal moment by the lake" loading="lazy" />
+              <img src="Rsvp Pics/photo urut/3.jpg" alt="Gallery photo 3" loading="lazy" />
             </figure>
             <figure class="gallery-card">
-              <img src="assets/rsvp/04-winery.jpg" alt="Andrew and Evelyn at the winery" loading="lazy" />
+              <img src="Rsvp Pics/photo urut/4.jpg" alt="Gallery photo 4" loading="lazy" />
             </figure>
             <figure class="gallery-card">
-              <img src="assets/rsvp/03-yosemite-reflection-upright.jpg" alt="Andrew and Evelyn by the reflection lake" loading="lazy" />
+              <img src="Rsvp Pics/photo urut/5.jpg" alt="Gallery photo 5" loading="lazy" />
             </figure>
             <figure class="gallery-card">
-              <img src="assets/rsvp/07-graduation.jpeg" alt="A graduation celebration memory" loading="lazy" />
+              <img src="Rsvp Pics/photo urut/6.png" alt="Gallery photo 6" loading="lazy" />
             </figure>
             <figure class="gallery-card">
-              <img src="assets/rsvp/08-garden.jpg" alt="Andrew and Evelyn in a garden walkway" loading="lazy" />
+              <img src="Rsvp Pics/photo urut/7.jpg" alt="Gallery photo 7" loading="lazy" />
             </figure>
           </div>
-          <button class="gallery-arrow gallery-arrow-next" type="button" aria-label="Next photo">›</button>
         </div>
       </div>
     </section>
@@ -112,9 +117,8 @@
       <div class="container narrow reveal">
         <p class="section-label">RSVP</p>
         <h2>We would be honored by your presence</h2>
-        <p class="rsvp-policy">We're delighted to host you for our destination wedding. We will provide 3 nights
-          of hotel accommodation and local transportation during the wedding celebrations. Guests are kindly asked to
-          arrange and cover their own airfare.</p>
+        <p class="rsvp-policy">We're delighted to host you at our wedding!<br>Three nights of accomodation will be
+          provided.</p>
 
         <form class="rsvp-form" id="rsvpForm" novalidate data-webhook-url="/api/rsvp"
           data-google-webhook-url="https://script.google.com/macros/s/AKfycbyoDM5iWujRnymL37qgRsL19XMFLJbwTZlijuWvlrRftjeGJmAfF4dgD6KQrousuxUneg/exec">
@@ -166,7 +170,10 @@
   </main>
 
   <footer class="footer">
-    <p>With love, Andrew & Evelyn</p>
+    <p>
+      <span class="footer-love">With Love,</span><br>
+      <span class="footer-family">Mr &amp; Ms. Andreas Koeswanto<br>Mr &amp; Ms. Francis Hariono<br>Andrew &amp; Evelyn</span>
+    </p>
   </footer>
 
   <audio id="bgMusic" preload="metadata" loop>
