@@ -69,9 +69,12 @@
 }
 
 :root {
-  --bg: #1e1b19;          /* Cod Gray */
-  --bg-soft: #6d4f3e;     /* Tobacco Brown */
-  --ink: #c0b3a5;         /* Malta */
+  --bg: #1e1b19;
+  /* Cod Gray */
+  --bg-soft: #6d4f3e;
+  /* Tobacco Brown */
+  --ink: #c0b3a5;
+  /* Malta */
   --muted: #b79f87;
   --line: rgba(192, 179, 165, 0.28);
   --card: rgba(30, 27, 25, 0.82);
@@ -188,10 +191,12 @@ body.opener-locked footer {
     transform: scale(1.02);
     filter: contrast(1.03) saturate(1.03);
   }
+
   60% {
     transform: scale(1.12);
     filter: contrast(1.04) saturate(1.04) blur(1.3px);
   }
+
   100% {
     transform: scale(1.2);
     filter: contrast(1.05) saturate(1.05) brightness(0.94) blur(2.8px);
@@ -227,13 +232,11 @@ h3 {
   right: 0;
   bottom: 0;
   height: clamp(230px, 40vh, 500px);
-  background: linear-gradient(
-    180deg,
-    rgba(30, 27, 25, 0) 0%,
-    rgba(30, 27, 25, 0.5) 36%,
-    rgba(30, 27, 25, 0.86) 68%,
-    var(--bg) 100%
-  );
+  background: linear-gradient(180deg,
+      rgba(30, 27, 25, 0) 0%,
+      rgba(30, 27, 25, 0.5) 36%,
+      rgba(30, 27, 25, 0.86) 68%,
+      var(--bg) 100%);
   pointer-events: none;
   z-index: 1;
 }
@@ -305,13 +308,13 @@ h3 {
 .hero h1 .hero-name.amp {
   color: #2a241f;
   font-family: "Allura", "Hello Santuy", "Corporate A Pro", serif;
-  font-size: 0.9em;
-  font-weight: 400;
+  font-size: 0.8em;
+  font-weight: 300;
   align-self: center;
   padding: 0;
   line-height: 1;
   letter-spacing: 0.005em;
-  transform: translateY(2px);
+  transform: translate(-12px, 2px) scaleX(0.68) scaleY(0.94);
 }
 
 .hero h1 .hero-chip {
@@ -344,13 +347,13 @@ h3 {
 
 .hero-subtitle {
   margin: 2px 0 0;
-  margin-left: 8ch;
+  margin-left: 7ch;
   color: #322a23;
   letter-spacing: 0.11em;
   text-transform: uppercase;
   font-size: 0.78rem;
   text-shadow: none;
-  font-family: "Corporate A Pro", sans-serif;
+  font-family: "Cantarell", sans-serif;
   font-weight: 500;
   display: inline-block;
   text-align: left;
@@ -386,17 +389,19 @@ h3 {
 }
 
 @keyframes hero-nudge {
+
   0%,
   100% {
     transform: translate(-50%, 0);
   }
+
   50% {
     transform: translate(-50%, 4px);
   }
 }
 
 .section {
-  padding: 86px 16px;
+  padding: 50px 16px;
 }
 
 .container {
@@ -557,30 +562,28 @@ h2 {
   position: relative;
 }
 
-.detail-event + .detail-event {
+.detail-event+.detail-event {
   margin-top: 20px;
   padding-top: 20px;
   border-top: none;
   position: relative;
 }
 
-.detail-card-day .detail-event + .detail-event::before {
+.detail-card-day .detail-event+.detail-event::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    rgba(166, 137, 112, 0) 0%,
-    rgba(166, 137, 112, 0.34) 18%,
-    rgba(166, 137, 112, 0.34) 82%,
-    rgba(166, 137, 112, 0) 100%
-  );
+  background: linear-gradient(90deg,
+      rgba(166, 137, 112, 0) 0%,
+      rgba(166, 137, 112, 0.34) 18%,
+      rgba(166, 137, 112, 0.34) 82%,
+      rgba(166, 137, 112, 0) 100%);
 }
 
-.detail-card-day .detail-event + .detail-event::after {
+.detail-card-day .detail-event+.detail-event::after {
   content: "";
   position: absolute;
   top: -3px;
@@ -695,9 +698,7 @@ h2 {
     opacity 1.5s cubic-bezier(0.22, 1, 0.36, 1),
     transform 1.5s cubic-bezier(0.22, 1, 0.36, 1);
   opacity: calc(var(--card-opacity) * (0.2 + (0.8 * var(--entry-progress))));
-  transform: translateX(calc(-50% + var(--card-shift)))
-    scale(calc(var(--card-scale) * (0.84 + (0.16 * var(--entry-progress)))))
-    rotateY(calc(var(--card-tilt) * var(--entry-progress)));
+  transform: translateX(calc(-50% + var(--card-shift))) scale(calc(var(--card-scale) * (0.84 + (0.16 * var(--entry-progress))))) rotateY(calc(var(--card-tilt) * var(--entry-progress)));
   transform-origin: center center;
   transform-style: preserve-3d;
   backface-visibility: hidden;
@@ -976,9 +977,19 @@ h2 {
 
 .closing {
   position: relative;
-  padding-top: 28px;
-  padding-bottom: 72px;
-  background: url("assets/closing-hearts-bg.jpg") center 30% / cover no-repeat;
+  padding: 0;
+  min-height: clamp(273px, 43vw, 637px);
+  display: grid;
+  align-items: end;
+  background-image: url("assets/closing-hearts-bg.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 40% top;
+}
+
+.closing .container {
+  width: 100%;
+  max-width: none;
 }
 
 .closing-wrap {
@@ -986,15 +997,15 @@ h2 {
   z-index: 1;
   text-align: center;
   border-top: none;
-  padding-top: 0;
-  margin-top: -58px;
+  padding: 0 16px 160px;
+  margin-top: 0;
 }
 
 .closing-wrap p {
   margin: 0;
   color: #2a241f;
   font-family: "Corporate A Pro", sans-serif;
-  font-size: clamp(1.35rem, 3.2vw, 2rem);
+  font-size: clamp(1.05rem, 2.4vw, 1.5rem);
   line-height: 1.2;
   font-weight: 400;
   text-shadow: none;
@@ -1129,7 +1140,7 @@ h2 {
   }
 
   .section {
-    padding: 72px 16px;
+    padding: 40px 16px;
   }
 
 }
