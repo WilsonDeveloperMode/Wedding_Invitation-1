@@ -655,6 +655,8 @@ h2 {
   --gallery-card-width: min(68%, 560px);
   --gallery-card-height: clamp(260px, 44vw, 470px);
   --gallery-side-scale: 0.48;
+  --gallery-transition-duration: 1150ms;
+  --gallery-transition-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --gallery-side-width: calc(var(--gallery-card-width) * var(--gallery-side-scale));
   --gallery-gap: clamp(38px, 5vw, 90px);
   --gallery-side-offset: calc(((var(--gallery-card-width) + var(--gallery-side-width)) * 0.5) + var(--gallery-gap));
@@ -695,8 +697,8 @@ h2 {
   background: transparent;
   box-shadow: none;
   transition:
-    opacity 1.5s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity var(--gallery-transition-duration) var(--gallery-transition-ease),
+    transform var(--gallery-transition-duration) var(--gallery-transition-ease);
   opacity: calc(var(--card-opacity) * (0.2 + (0.8 * var(--entry-progress))));
   transform: translateX(calc(-50% + var(--card-shift))) scale(calc(var(--card-scale) * (0.84 + (0.16 * var(--entry-progress))))) rotateY(calc(var(--card-tilt) * var(--entry-progress)));
   transform-origin: center center;
@@ -997,7 +999,7 @@ h2 {
   z-index: 1;
   text-align: center;
   border-top: none;
-  padding: 0 16px 160px;
+  padding: 0 16px 130px;
   margin-top: 0;
 }
 
@@ -1005,7 +1007,7 @@ h2 {
   margin: 0;
   color: #2a241f;
   font-family: "Corporate A Pro", sans-serif;
-  font-size: clamp(1.05rem, 2.4vw, 1.5rem);
+  font-size: calc(clamp(1.05rem, 2.4vw, 1.5rem) + 0.0417rem);
   line-height: 1.2;
   font-weight: 400;
   text-shadow: none;
@@ -1114,7 +1116,8 @@ h2 {
   .gallery-scroll {
     --gallery-card-width: min(74%, 520px);
     --gallery-card-height: clamp(240px, 75vw, 420px);
-    --gallery-side-scale: 0.44;
+    --gallery-side-scale: 0.58;
+    --gallery-transition-duration: 860ms;
     --gallery-side-width: calc(var(--gallery-card-width) * var(--gallery-side-scale));
     --gallery-gap: clamp(24px, 6vw, 52px);
     --gallery-side-offset: calc(((var(--gallery-card-width) + var(--gallery-side-width)) * 0.5) + var(--gallery-gap));

@@ -846,12 +846,65 @@ function setupPhotoRoll() {
   let autoAdvanceTimer = null;
   let resumeAutoTimer = null;
   let touchStartX = 0;
+  let touchStartY = 0;
   let touchDeltaX = 0;
-  const swipeThreshold = 34;
+  let touchDeltaY = 0;
+  let touchLastX = 0;
+  let touchLastTime = 0;
+  let touchVelocityX = 0;
+  let dragVisualX = 0;
+  let dragVisualFrame = null;
+  let lastDragNavigateTime = 0;
+  let dragDirectionLocked = false;
+  let isHorizontalDrag = false;
+  let queuedDirection = 0;
+  const swipeThreshold = 42;
+  const flickVelocityThreshold = 0.45;
+  const minDragNavigateInterval = 120;
   const autoAdvanceDelay = 4000;
-  const motionDuration = 1500;
+  let motionDuration = 900;
   const dragInfluence = 0.34;
   const dragSnapDuration = 340;
+
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+  const parseDurationToMs = (value) => {
+    if (typeof value !== 'string') return 0;
+    const raw = value.trim();
+    if (raw.endsWith('ms')) {
+      return Number.parseFloat(raw.slice(0, -2)) || 0;
+    }
+    if (raw.endsWith('s')) {
+      return (Number.parseFloat(raw.slice(0, -1)) || 0) * 1000;
+    }
+    return Number.parseFloat(raw) || 0;
+  };
+
+  const refreshMotionDuration = () => {
+    const styles = window.getComputedStyle(photoRoll);
+    const configured = parseDurationToMs(styles.getPropertyValue('--gallery-transition-duration'));
+    motionDuration = clamp(Math.round(configured || 900), 260, 1500);
+  };
+
+  const renderDragVisual = () => {
+    dragVisualFrame = null;
+    photoRoll.style.transform = 'translate3d(' + dragVisualX.toFixed(2) + 'px, 0, 0)';
+  };
+
+  const setDragVisual = (targetX) => {
+    // Light low-pass filter to reduce jitter from noisy touch deltas on mobile.
+    dragVisualX = (dragVisualX * 0.68) + (targetX * 0.32);
+    if (dragVisualFrame !== null) return;
+    dragVisualFrame = window.requestAnimationFrame(renderDragVisual);
+  };
+
+  const resetDragVisual = () => {
+    dragVisualX = 0;
+    if (dragVisualFrame !== null) {
+      window.cancelAnimationFrame(dragVisualFrame);
+      dragVisualFrame = null;
+    }
+    photoRoll.style.transform = 'translate3d(0, 0, 0)';
+  };
 
   const normalizeIndex = (index) => {
     return ((index % totalCards) + totalCards) % totalCards;
@@ -915,26 +968,33 @@ function setupPhotoRoll() {
     updateVisibleGapSpacing();
   };
 
-  const goToNext = () => {
-    if (isAnimating) return;
+  const queueOrRunNavigation = (direction) => {
+    if (direction !== 1 && direction !== -1) return false;
+    if (isAnimating) {
+      queuedDirection = direction;
+      return false;
+    }
+
     isAnimating = true;
-    activeIndex = normalizeIndex(activeIndex + 1);
+    activeIndex = normalizeIndex(activeIndex + direction);
     updatePositions();
     window.clearTimeout(motionTimer);
     motionTimer = window.setTimeout(() => {
       isAnimating = false;
+      if (queuedDirection === 0) return;
+      const nextDirection = queuedDirection;
+      queuedDirection = 0;
+      queueOrRunNavigation(nextDirection);
     }, motionDuration);
+    return true;
+  };
+
+  const goToNext = () => {
+    queueOrRunNavigation(1);
   };
 
   const goToPrevious = () => {
-    if (isAnimating) return;
-    isAnimating = true;
-    activeIndex = normalizeIndex(activeIndex - 1);
-    updatePositions();
-    window.clearTimeout(motionTimer);
-    motionTimer = window.setTimeout(() => {
-      isAnimating = false;
-    }, motionDuration);
+    queueOrRunNavigation(-1);
   };
 
   const stopAutoAdvance = () => {
@@ -965,36 +1025,75 @@ function setupPhotoRoll() {
     stopAutoAdvance();
     isDragging = true;
     didDragNavigate = false;
+    dragDirectionLocked = false;
+    isHorizontalDrag = false;
+    queuedDirection = 0;
     window.clearTimeout(dragResetTimer);
     photoRoll.style.transition = 'none';
     touchStartX = event.touches[0].clientX;
+    touchStartY = event.touches[0].clientY;
     touchDeltaX = 0;
+    touchDeltaY = 0;
+    touchLastX = touchStartX;
+    touchLastTime = performance.now();
+    touchVelocityX = 0;
+    dragVisualX = 0;
+    lastDragNavigateTime = 0;
   };
 
   const onTouchMove = (event) => {
     if (event.touches.length !== 1 || isDragging === false) return;
     const currentX = event.touches[0].clientX;
-    touchDeltaX = currentX - touchStartX;
-    photoRoll.style.transform = 'translate3d(' + (touchDeltaX * dragInfluence).toFixed(2) + 'px, 0, 0)';
+    const currentY = event.touches[0].clientY;
+    const now = performance.now();
 
-    // Allow continuous swipe progression while finger is still down.
-    if (touchDeltaX <= -swipeThreshold && isAnimating === false) {
-      didDragNavigate = true;
-      goToNext();
-      restartAutoAdvanceWithDelay();
-      touchStartX = currentX;
-      touchDeltaX = 0;
-      photoRoll.style.transform = 'translate3d(0, 0, 0)';
+    touchDeltaX = currentX - touchStartX;
+    touchDeltaY = currentY - touchStartY;
+
+    if (dragDirectionLocked === false) {
+      if (Math.abs(touchDeltaX) > 8 || Math.abs(touchDeltaY) > 8) {
+        dragDirectionLocked = true;
+        isHorizontalDrag = Math.abs(touchDeltaX) >= Math.abs(touchDeltaY);
+      }
+    }
+
+    if (isHorizontalDrag === false) return;
+
+    const deltaTime = Math.max(8, now - touchLastTime);
+    touchVelocityX = (currentX - touchLastX) / deltaTime;
+    touchLastX = currentX;
+    touchLastTime = now;
+
+    if (isAnimating) {
+      setDragVisual(0);
       return;
     }
 
-    if (touchDeltaX >= swipeThreshold && isAnimating === false) {
+    setDragVisual(touchDeltaX * dragInfluence);
+
+    // Allow continuous swipe progression while finger is still down.
+    const canNavigateNow = (now - lastDragNavigateTime) >= minDragNavigateInterval;
+    if (touchDeltaX <= -swipeThreshold && canNavigateNow) {
+      queueOrRunNavigation(1);
+      lastDragNavigateTime = now;
       didDragNavigate = true;
-      goToPrevious();
       restartAutoAdvanceWithDelay();
       touchStartX = currentX;
       touchDeltaX = 0;
-      photoRoll.style.transform = 'translate3d(0, 0, 0)';
+      touchVelocityX = 0;
+      resetDragVisual();
+      return;
+    }
+
+    if (touchDeltaX >= swipeThreshold && canNavigateNow) {
+      queueOrRunNavigation(-1);
+      lastDragNavigateTime = now;
+      didDragNavigate = true;
+      restartAutoAdvanceWithDelay();
+      touchStartX = currentX;
+      touchDeltaX = 0;
+      touchVelocityX = 0;
+      resetDragVisual();
     }
   };
 
@@ -1002,7 +1101,7 @@ function setupPhotoRoll() {
     if (isDragging === false) return;
     isDragging = false;
     photoRoll.style.transition = 'transform ' + dragSnapDuration + 'ms cubic-bezier(0.22, 1, 0.36, 1)';
-    photoRoll.style.transform = 'translate3d(0, 0, 0)';
+    resetDragVisual();
     window.clearTimeout(dragResetTimer);
     dragResetTimer = window.setTimeout(() => {
       photoRoll.style.transition = '';
@@ -1013,11 +1112,19 @@ function setupPhotoRoll() {
     restartAutoAdvanceWithDelay();
 
     if (didDragNavigate) return;
-    if (Math.abs(touchDeltaX) < swipeThreshold) return;
-    if (touchDeltaX < 0) {
-      goToNext();
+
+    const shouldSwipeByDistance = Math.abs(touchDeltaX) >= swipeThreshold;
+    const shouldSwipeByVelocity = Math.abs(touchVelocityX) >= flickVelocityThreshold;
+    if (!shouldSwipeByDistance && !shouldSwipeByVelocity) return;
+
+    const direction = shouldSwipeByDistance
+      ? (touchDeltaX < 0 ? 1 : -1)
+      : (touchVelocityX < 0 ? 1 : -1);
+
+    if (direction === 1) {
+      queueOrRunNavigation(1);
     } else {
-      goToPrevious();
+      queueOrRunNavigation(-1);
     }
   };
 
@@ -1062,7 +1169,10 @@ function setupPhotoRoll() {
     startAutoAdvance();
   });
 
-  window.addEventListener('resize', updateVisibleGapSpacing);
+  window.addEventListener('resize', () => {
+    refreshMotionDuration();
+    updateVisibleGapSpacing();
+  });
   cards.forEach((card) => {
     const image = card.querySelector('img');
     if (image === null) return;
@@ -1095,6 +1205,7 @@ function setupPhotoRoll() {
     });
   };
 
+  refreshMotionDuration();
   updatePositions();
   updateEntryProgress();
   window.addEventListener('scroll', requestEntryProgress, { passive: true });
