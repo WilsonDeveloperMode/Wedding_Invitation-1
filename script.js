@@ -719,6 +719,13 @@ function setupVideoOpener() {
   let hasStarted = false;
   let isTransitioning = false;
   let hasNearEndTransitionTriggered = false;
+  let failsafeTimer = null;
+
+  const forceUnlock = () => {
+    videoOpener.classList.add('is-hidden');
+    videoOpener.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('opener-locked');
+  };
 
   const resetToBeginning = () => {
     // Always restart from the invitation opener state when page is opened/restored.
@@ -748,6 +755,12 @@ function setupVideoOpener() {
       bgMusic.pause();
       bgMusic.currentTime = 0;
     }
+
+    if (failsafeTimer) window.clearTimeout(failsafeTimer);
+    failsafeTimer = window.setTimeout(() => {
+      if (videoOpener.classList.contains('is-hidden')) return;
+      forceUnlock();
+    }, 5000);
   };
 
   const finishTransition = async () => {
@@ -759,6 +772,10 @@ function setupVideoOpener() {
     window.setTimeout(() => {
       videoOpener.classList.add('is-hidden');
       document.body.classList.remove('opener-locked');
+      if (failsafeTimer) {
+        window.clearTimeout(failsafeTimer);
+        failsafeTimer = null;
+      }
     }, 900);
 
     if (bgMusic) {
