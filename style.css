@@ -115,6 +115,24 @@ body.opener-locked footer {
   visibility: hidden;
 }
 
+body.opener-locked .invitation-shell {
+  overflow: hidden !important;
+}
+
+.desktop-layout {
+  width: 100%;
+}
+
+.desktop-photo-panel {
+  display: none;
+}
+
+.invitation-shell {
+  width: 100%;
+  background: var(--bg);
+  position: relative;
+}
+
 .video-opener {
   position: fixed;
   inset: 0;
@@ -1058,6 +1076,226 @@ h2 {
   transform: translateY(0);
 }
 
+@media (min-width: 1100px) {
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at top left, rgba(210, 183, 157, 0.12), transparent 32%),
+      linear-gradient(135deg, #171311 0%, #261f1a 45%, #110e0d 100%);
+  }
+
+  .desktop-layout {
+    --desktop-stage-height: min(915px, calc(100vh - 36px), calc(100dvh - 36px));
+    min-height: 100vh;
+    width: 100%;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 412px;
+    align-items: start;
+    gap: 24px;
+    padding: 18px;
+  }
+
+  .desktop-photo-panel {
+    position: sticky;
+    top: 18px;
+    display: block;
+    height: var(--desktop-stage-height);
+    width: 100%;
+    justify-self: stretch;
+    border-radius: 0;
+    overflow: hidden;
+    box-shadow: none;
+  }
+
+  .desktop-photo-panel img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center center;
+    filter: brightness(0.9) contrast(0.98);
+  }
+
+  .desktop-photo-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(252, 249, 244, 0.06) 0%, rgba(252, 249, 244, 0) 28%, rgba(18, 15, 13, 0.08) 62%, rgba(18, 15, 13, 0.34) 100%);
+  }
+
+  .invitation-shell {
+    --phone-shell-width: 412px;
+    --phone-shell-height: 915px;
+    --phone-shell-visible-height: var(--desktop-stage-height);
+    width: var(--phone-shell-width);
+    height: var(--phone-shell-height);
+    max-height: var(--phone-shell-visible-height);
+    justify-self: start;
+    border-radius: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-shadow: none;
+    border: none;
+    background: var(--bg);
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .invitation-shell::-webkit-scrollbar {
+    display: none;
+  }
+
+  .invitation-shell .hero {
+    min-height: var(--phone-shell-visible-height);
+    place-items: start center;
+    padding: 22px 16px 32px;
+  }
+
+  .invitation-shell .hero-media img {
+    object-position: 32% 34%;
+    filter: sepia(0.1) saturate(1.04) brightness(1.24) contrast(1.03);
+  }
+
+  .invitation-shell .hero-overlay {
+    background:
+      linear-gradient(180deg, rgba(252, 249, 244, 0.78) 0%, rgba(252, 249, 244, 0.36) 22%, rgba(252, 249, 244, 0) 50%),
+      linear-gradient(180deg, rgba(30, 27, 25, 0) 65%, rgba(30, 27, 25, 0.2) 100%);
+  }
+
+  .invitation-shell .hero-content {
+    text-align: left;
+    margin-right: 0;
+    margin-top: 0;
+    padding-top: 24px;
+    padding-left: 12px;
+    width: min(700px, 100%);
+  }
+
+  .invitation-shell .hero h1 {
+    font-size: 2.1rem;
+  }
+
+  .invitation-shell .hero-subtitle {
+    margin-left: 7ch;
+  }
+
+  .invitation-shell .section {
+    padding: 40px 16px;
+  }
+
+  .invitation-shell .details-grid {
+    margin-top: 20px;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .invitation-shell .details h2 {
+    max-width: 100%;
+    font-size: 1.6rem;
+    line-height: 1.14;
+  }
+
+  .invitation-shell .details {
+    --detail-title-size: 1.36rem;
+    --detail-location-size: 0.95rem;
+  }
+
+  .invitation-shell .detail-card {
+    min-height: 0;
+    padding: 16px 15px 14px;
+  }
+
+  .invitation-shell .gallery-scroll {
+    --gallery-card-width: min(74%, 520px);
+    --gallery-card-height: 309px;
+    --gallery-side-scale: 0.58;
+    --gallery-transition-duration: 860ms;
+    --gallery-side-width: calc(var(--gallery-card-width) * var(--gallery-side-scale));
+    --gallery-gap: 25px;
+    --gallery-side-offset: calc(((var(--gallery-card-width) + var(--gallery-side-width)) * 0.5) + var(--gallery-gap));
+  }
+
+  .invitation-shell .gallery-card {
+    width: var(--gallery-card-width);
+    height: var(--gallery-card-height);
+  }
+
+  .invitation-shell .gallery-arrow {
+    width: 38px;
+    height: 38px;
+    font-size: 1.5rem;
+  }
+
+  .invitation-shell .gallery-arrow-prev {
+    left: 6px;
+  }
+
+  .invitation-shell .gallery-arrow-next {
+    right: 6px;
+  }
+
+  .invitation-shell .closing {
+    min-height: 273px;
+  }
+
+  .invitation-shell .closing-wrap p {
+    font-size: 1.09rem;
+  }
+
+  .invitation-shell .footer p {
+    font-size: 1.05rem;
+  }
+
+  .video-opener {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: var(--phone-shell-visible-height);
+    border-radius: 0;
+  }
+
+  .video-opener video,
+  .video-opener-image,
+  .video-opener-overlay {
+    border-radius: 0;
+  }
+}
+
+@media (max-width: 1099px) {
+  .details-grid {
+    margin-top: 20px;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .detail-card-day {
+    grid-column: auto;
+  }
+
+  .details h2 {
+    max-width: 100%;
+    font-size: clamp(1.45rem, 6.2vw, 1.86rem);
+    line-height: 1.14;
+  }
+
+  .details {
+    --detail-title-size: 1.36rem;
+    --detail-location-size: 0.95rem;
+  }
+
+  .detail-card {
+    min-height: 0;
+    padding: 16px 15px 14px;
+  }
+}
+
 @media (max-width: 900px) {
   .video-opener-instruction {
     font-size: 0.7rem;
@@ -1090,29 +1328,6 @@ h2 {
     padding-left: clamp(8px, 3vw, 14px);
     width: min(700px, 100%);
   }
-
-  .details-grid {
-    margin-top: 20px;
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .details h2 {
-    max-width: 100%;
-    font-size: clamp(1.45rem, 6.2vw, 1.86rem);
-    line-height: 1.14;
-  }
-
-  .details {
-    --detail-title-size: 1.36rem;
-    --detail-location-size: 0.95rem;
-  }
-
-  .detail-card {
-    min-height: 0;
-    padding: 16px 15px 14px;
-  }
-
   .gallery-scroll {
     --gallery-card-width: min(74%, 520px);
     --gallery-card-height: clamp(240px, 75vw, 420px);

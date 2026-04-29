@@ -12,6 +12,7 @@ const guestCountValue = document.getElementById('guestCountValue');
 const bgMusic = document.getElementById('bgMusic');
 const videoOpener = document.getElementById('videoOpener');
 const openerVideo = document.getElementById('openerVideo');
+const invitationShell = document.querySelector('.invitation-shell');
 const galleryCarousel = document.getElementById('galleryCarousel');
 const galleryTrack = document.getElementById('galleryTrack');
 const galleryViewport = document.getElementById('galleryViewport');
@@ -27,6 +28,33 @@ const isIOSDevice =
 const isSafariBrowser =
   /Safari/.test(userAgent) && /CriOS|FxiOS|EdgiOS|OPiOS/.test(userAgent) === false;
 const useIosSafariAudioFallback = isIOSDevice && isSafariBrowser;
+const desktopShellMediaQuery = window.matchMedia('(min-width: 1100px)');
+
+function getScrollContainer() {
+  if (desktopShellMediaQuery.matches && invitationShell) {
+    return invitationShell;
+  }
+  return window;
+}
+
+function getScrollTop() {
+  const scrollContainer = getScrollContainer();
+  if (scrollContainer === window) return window.scrollY || window.pageYOffset || 0;
+  return scrollContainer.scrollTop;
+}
+
+function getViewportHeight() {
+  const scrollContainer = getScrollContainer();
+  if (scrollContainer === window) {
+    return window.innerHeight || document.documentElement.clientHeight || 1;
+  }
+  return scrollContainer.clientHeight || 1;
+}
+
+function getObserverRoot() {
+  const scrollContainer = getScrollContainer();
+  return scrollContainer === window ? null : scrollContainer;
+}
 
 function clampInviteeCount(value) {
   const count = Number(value);
@@ -250,6 +278,7 @@ function setupReveal() {
       });
     },
     {
+      root: getObserverRoot(),
       threshold: 0.16,
       rootMargin: '0px 0px -8% 0px'
     }
@@ -265,7 +294,7 @@ function setupParallax() {
 
   const updateParallax = () => {
     ticking = false;
-    const viewportH = window.innerHeight;
+    const viewportH = getViewportHeight();
 
     parallaxElements.forEach((el) => {
       const speed = Number(el.dataset.speed || 0.05);
@@ -283,6 +312,9 @@ function setupParallax() {
   };
 
   window.addEventListener('scroll', onScroll, { passive: true });
+  if (invitationShell) {
+    invitationShell.addEventListener('scroll', onScroll, { passive: true });
+  }
   window.addEventListener('resize', onScroll);
   updateParallax();
 }
@@ -295,7 +327,7 @@ function setupHeroScrollMotion() {
   const updateHero = () => {
     ticking = false;
     const heroHeight = Math.max(hero.offsetHeight, 1);
-    const progress = Math.min(1, Math.max(0, window.scrollY / heroHeight));
+    const progress = Math.min(1, Math.max(0, getScrollTop() / heroHeight));
 
     hero.style.setProperty('--hero-shift', (progress * 68).toFixed(2) + 'px');
     hero.style.setProperty('--hero-scale', (1 + progress * 0.08).toFixed(3));
@@ -311,6 +343,9 @@ function setupHeroScrollMotion() {
   };
 
   window.addEventListener('scroll', onScroll, { passive: true });
+  if (invitationShell) {
+    invitationShell.addEventListener('scroll', onScroll, { passive: true });
+  }
   window.addEventListener('resize', onScroll);
   updateHero();
 }
@@ -719,7 +754,6 @@ function setupVideoOpener() {
   let hasStarted = false;
   let isTransitioning = false;
   let hasNearEndTransitionTriggered = false;
-  let failsafeTimer = null;
 
   const forceUnlock = () => {
     videoOpener.classList.add('is-hidden');
@@ -741,6 +775,9 @@ function setupVideoOpener() {
       history.scrollRestoration = 'manual';
     }
     window.scrollTo(0, 0);
+    if (invitationShell) {
+      invitationShell.scrollTop = 0;
+    }
 
     if (openerVideo) {
       openerVideo.pause();
@@ -755,12 +792,6 @@ function setupVideoOpener() {
       bgMusic.pause();
       bgMusic.currentTime = 0;
     }
-
-    if (failsafeTimer) window.clearTimeout(failsafeTimer);
-    failsafeTimer = window.setTimeout(() => {
-      if (videoOpener.classList.contains('is-hidden')) return;
-      forceUnlock();
-    }, 5000);
   };
 
   const finishTransition = async () => {
@@ -772,10 +803,6 @@ function setupVideoOpener() {
     window.setTimeout(() => {
       videoOpener.classList.add('is-hidden');
       document.body.classList.remove('opener-locked');
-      if (failsafeTimer) {
-        window.clearTimeout(failsafeTimer);
-        failsafeTimer = null;
-      }
     }, 900);
 
     if (bgMusic) {
@@ -1204,7 +1231,7 @@ function setupPhotoRoll() {
     }
 
     const rect = galleryRoll.getBoundingClientRect();
-    const vh = window.innerHeight || document.documentElement.clientHeight || 1;
+    const vh = getViewportHeight();
     const start = vh * 0.9;
     const end = vh * 0.3;
     const raw = (start - rect.top) / (start - end);
@@ -1226,6 +1253,9 @@ function setupPhotoRoll() {
   updatePositions();
   updateEntryProgress();
   window.addEventListener('scroll', requestEntryProgress, { passive: true });
+  if (invitationShell) {
+    invitationShell.addEventListener('scroll', requestEntryProgress, { passive: true });
+  }
   window.addEventListener('resize', requestEntryProgress);
   if (galleryRoll !== null && 'IntersectionObserver' in window) {
     const autoPlayObserver = new IntersectionObserver(
@@ -1238,7 +1268,7 @@ function setupPhotoRoll() {
           }
         });
       },
-      { threshold: 0.2 }
+      { root: getObserverRoot(), threshold: 0.2 }
     );
     autoPlayObserver.observe(galleryRoll);
   }
