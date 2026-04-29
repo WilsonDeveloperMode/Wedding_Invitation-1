@@ -691,10 +691,20 @@ h2 {
   touch-action: pan-y;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
 }
 
 .gallery-scroll::-webkit-scrollbar {
   display: none;
+}
+
+.gallery-scroll.is-dragging,
+.gallery-scroll.is-dragging * {
+  cursor: grabbing !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
 }
 
 .gallery-card {
@@ -775,6 +785,7 @@ h2 {
   object-fit: contain;
   object-position: center;
   border-radius: 18px;
+  -webkit-user-drag: none;
   filter: grayscale(1) saturate(0.72) contrast(1.02) brightness(0.9);
   transition: filter 0.95s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;

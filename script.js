@@ -901,6 +901,10 @@ function setupPhotoRoll() {
   let lastDragNavigateTime = 0;
   let dragDirectionLocked = false;
   let isHorizontalDrag = false;
+  let isPointerDragging = false;
+  let pointerStartX = 0;
+  let pointerDeltaX = 0;
+  let pointerLastNavigateTime = 0;
   let queuedDirection = 0;
   const swipeThreshold = 42;
   const flickVelocityThreshold = 0.45;
@@ -1172,6 +1176,99 @@ function setupPhotoRoll() {
     }
   };
 
+  const onPointerDown = (event) => {
+    if (event.pointerType !== 'mouse' || event.button !== 0) return;
+    isPointerDragging = true;
+    pointerStartX = event.clientX;
+    pointerDeltaX = 0;
+    pointerLastNavigateTime = 0;
+    stopAutoAdvance();
+    photoRoll.classList.add('is-dragging');
+    photoRoll.style.transition = 'none';
+    if (typeof photoRoll.setPointerCapture === 'function') {
+      photoRoll.setPointerCapture(event.pointerId);
+    }
+  };
+
+  const onPointerMove = (event) => {
+    if (!isPointerDragging) return;
+    event.preventDefault();
+    pointerDeltaX = event.clientX - pointerStartX;
+
+    if (isAnimating) {
+      setDragVisual(0);
+      return;
+    }
+
+    setDragVisual(pointerDeltaX * dragInfluence);
+
+    const now = performance.now();
+    const canNavigateNow = (now - pointerLastNavigateTime) >= minDragNavigateInterval;
+
+    if (pointerDeltaX <= -swipeThreshold && canNavigateNow) {
+      queueOrRunNavigation(1);
+      pointerLastNavigateTime = now;
+      restartAutoAdvanceWithDelay();
+      pointerStartX = event.clientX;
+      pointerDeltaX = 0;
+      resetDragVisual();
+      return;
+    }
+
+    if (pointerDeltaX >= swipeThreshold && canNavigateNow) {
+      queueOrRunNavigation(-1);
+      pointerLastNavigateTime = now;
+      restartAutoAdvanceWithDelay();
+      pointerStartX = event.clientX;
+      pointerDeltaX = 0;
+      resetDragVisual();
+    }
+  };
+
+  const onPointerEnd = (event) => {
+    if (!isPointerDragging) return;
+    isPointerDragging = false;
+    photoRoll.classList.remove('is-dragging');
+    if (
+      event &&
+      typeof photoRoll.hasPointerCapture === 'function' &&
+      photoRoll.hasPointerCapture(event.pointerId)
+    ) {
+      photoRoll.releasePointerCapture(event.pointerId);
+    }
+    photoRoll.style.transition = 'transform ' + dragSnapDuration + 'ms cubic-bezier(0.22, 1, 0.36, 1)';
+    resetDragVisual();
+    window.clearTimeout(dragResetTimer);
+    dragResetTimer = window.setTimeout(() => {
+      photoRoll.style.transition = '';
+    }, dragSnapDuration + 20);
+
+    if (Math.abs(pointerDeltaX) >= swipeThreshold) {
+      if (pointerDeltaX < 0) {
+        goToNext();
+      } else {
+        goToPrevious();
+      }
+    }
+
+    restartAutoAdvanceWithDelay();
+  };
+
+  const onWheel = (event) => {
+    if (Math.abs(event.deltaX) < 12 && Math.abs(event.deltaY) < 12) return;
+    const horizontalIntent = Math.abs(event.deltaX) >= Math.abs(event.deltaY)
+      ? event.deltaX
+      : event.deltaY;
+    if (Math.abs(horizontalIntent) < 18) return;
+    event.preventDefault();
+    if (horizontalIntent > 0) {
+      goToNext();
+    } else {
+      goToPrevious();
+    }
+    restartAutoAdvanceWithDelay();
+  };
+
   if (prevButton !== null) {
     prevButton.addEventListener('click', () => {
       goToPrevious();
@@ -1200,9 +1297,13 @@ function setupPhotoRoll() {
   photoRoll.addEventListener('touchmove', onTouchMove, { passive: true });
   photoRoll.addEventListener('touchend', onTouchEnd);
   photoRoll.addEventListener('touchcancel', onTouchEnd);
+  photoRoll.addEventListener('pointerdown', onPointerDown);
+  photoRoll.addEventListener('pointermove', onPointerMove);
+  photoRoll.addEventListener('pointerup', onPointerEnd);
+  photoRoll.addEventListener('pointercancel', onPointerEnd);
+  photoRoll.addEventListener('lostpointercapture', onPointerEnd);
+  photoRoll.addEventListener('wheel', onWheel, { passive: false });
 
-  photoRoll.addEventListener('mouseenter', stopAutoAdvance);
-  photoRoll.addEventListener('mouseleave', startAutoAdvance);
   photoRoll.addEventListener('focusin', stopAutoAdvance);
   photoRoll.addEventListener('focusout', startAutoAdvance);
   document.addEventListener('visibilitychange', () => {
