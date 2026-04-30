@@ -488,6 +488,10 @@ h2 {
   box-shadow: inset 0 1px 0 rgba(210, 183, 157, 0.05);
 }
 
+.detail-card:not(.detail-card-day) {
+  min-height: 128px;
+}
+
 .details-grid .detail-card.reveal {
   opacity: 0;
   transform: translateX(-44px);
@@ -1099,23 +1103,24 @@ h2 {
 
 @media (min-width: 1100px) {
   .hero-content {
-    width: min(760px, 100%);
+    width: min(640px, 44vw);
     margin-left: auto;
     margin-right: 0;
-    padding-top: clamp(18px, 4vh, 44px);
+    padding-top: clamp(180px, 23vh, 300px);
     padding-left: 0;
-    padding-right: clamp(32px, 6vw, 88px);
+    padding-right: clamp(8px, 2vw, 28px);
     text-align: right;
   }
 
   .hero h1 {
     margin-left: auto;
     align-items: flex-end;
+    max-width: 100%;
   }
 
   .hero-subtitle {
     margin-left: 0;
-    margin-right: 2ch;
+    margin-right: 0.5ch;
     text-align: right;
   }
 
