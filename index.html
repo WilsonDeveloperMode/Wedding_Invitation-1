@@ -31,177 +31,168 @@
 </head>
 
 <body class="opener-locked">
-  <div class="desktop-layout">
-    <aside class="desktop-photo-panel" aria-hidden="true">
-      <img src="assets/photo-embrace.jpg" alt="" />
-      <div class="desktop-photo-overlay"></div>
-    </aside>
-
-    <div class="invitation-shell">
-      <div class="video-opener" id="videoOpener" role="button" tabindex="0" aria-label="Play opening video">
-        <video id="openerVideo" muted playsinline preload="auto" poster="assets/opener-envelope.png">
-          <source src="assets/envelope-01.mp4" type="video/mp4" />
-        </video>
-        <div class="video-opener-overlay" aria-hidden="true">
-          <p class="video-opener-instruction">Tap anywhere to begin</p>
-        </div>
-      </div>
-
-      <header class="hero" id="top">
-        <div class="hero-media parallax" data-speed="0.06" aria-hidden="true">
-          <img src="assets/photo-portrait.jpg" alt="Andrew and Evelyn portrait at the lake overlook" />
-        </div>
-        <div class="hero-overlay" aria-hidden="true"></div>
-
-        <div class="hero-content reveal show">
-          <h1>
-            <span class="hero-name hero-chip">Andrew Koeswanto</span>
-            <span class="hero-name amp hero-chip">&amp;</span>
-            <span class="hero-name hero-chip no-break">Evelyn Hariono</span>
-          </h1>
-          <p class="hero-subtitle">Wedding RSVP</p>
-        </div>
-        <a class="hero-link hero-scroll" href="#details" aria-label="Scroll to wedding details">↓</a>
-      </header>
-
-      <main>
-        <section class="section details" id="details">
-          <div class="container reveal">
-            <p class="section-label">Wedding Week</p>
-            <h2>An intimate celebration with our closest family and friends</h2>
-
-            <div class="details-grid">
-              <article class="detail-card reveal">
-                <p class="detail-date">October 19, 2026</p>
-                <h3>Welcome Dinner</h3>
-              </article>
-
-              <article class="detail-card detail-card-day reveal">
-                <p class="detail-date">October 20, 2026</p>
-                <div class="detail-event">
-                  <h3>Holy Matrimony</h3>
-                  <div class="detail-meta">
-                    <p class="detail-time">3:00 PM to 4:00 PM</p>
-                    <p class="detail-location">St Mary's Cathedral</p>
-                  </div>
-                </div>
-                <div class="detail-event">
-                  <h3>Reception</h3>
-                  <div class="detail-meta">
-                    <p class="detail-time">6:30 PM onwards</p>
-                    <p class="detail-location">Bennelong, Sydney Opera House</p>
-                  </div>
-                </div>
-              </article>
-
-              <article class="detail-card reveal">
-                <p class="detail-date">October 21, 2026</p>
-                <h3>Farewell Lunch</h3>
-              </article>
-            </div>
-          </div>
-        </section>
-
-        <section class="section gallery" id="gallery">
-          <div class="container">
-            <article class="gallery-copy reveal">
-              <p class="section-label">Gallery</p>
-              <h2>Moments we will always remember</h2>
-            </article>
-
-            <div class="gallery-roll reveal" aria-label="Photo gallery">
-              <div class="gallery-scroll" tabindex="0" aria-label="Photo gallery carousel">
-                <figure class="gallery-card">
-                  <img src="Rsvp Pics/photo urut/1.jpg" alt="Gallery photo 1" loading="lazy" />
-                </figure>
-                <figure class="gallery-card">
-                  <img src="Rsvp Pics/photo urut/2.jpeg" alt="Gallery photo 2" loading="lazy" />
-                </figure>
-                <figure class="gallery-card">
-                  <img src="Rsvp Pics/photo urut/3.jpg" alt="Gallery photo 3" loading="lazy" />
-                </figure>
-                <figure class="gallery-card">
-                  <img src="Rsvp Pics/photo urut/4.jpg" alt="Gallery photo 4" loading="lazy" />
-                </figure>
-                <figure class="gallery-card">
-                  <img src="Rsvp Pics/photo urut/5.jpg" alt="Gallery photo 5" loading="lazy" />
-                </figure>
-                <figure class="gallery-card">
-                  <img src="Rsvp Pics/photo urut/6.png" alt="Gallery photo 6" loading="lazy" />
-                </figure>
-                <figure class="gallery-card">
-                  <img src="Rsvp Pics/photo urut/7.jpg" alt="Gallery photo 7" loading="lazy" />
-                </figure>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="section rsvp" id="rsvp">
-          <div class="container narrow reveal">
-            <p class="section-label">RSVP</p>
-            <h2>We would be honored by your presence</h2>
-            <p class="rsvp-policy">We're delighted to host you at our wedding!<br>Three nights of accomodation will be
-              provided.</p>
-
-            <form class="rsvp-form" id="rsvpForm" novalidate data-webhook-url="/api/rsvp"
-              data-google-webhook-url="https://script.google.com/macros/s/AKfycbyoDM5iWujRnymL37qgRsL19XMFLJbwTZlijuWvlrRftjeGJmAfF4dgD6KQrousuxUneg/exec">
-              <label>
-                Guest Name
-                <input type="text" name="name" required />
-              </label>
-
-              <label>
-                Attendance
-                <select name="attendance" required>
-                  <option value="">Select your response</option>
-                  <option value="yes">Joyfully accept</option>
-                  <option value="no">Regretfully decline</option>
-                </select>
-              </label>
-
-              <input type="hidden" name="guests" value="1" />
-
-              <div class="invitees-block" id="inviteesBlock" hidden>
-                <p class="invitees-title">Who is coming?</p>
-                <p class="invitees-note" id="inviteesNote"></p>
-                <div class="guest-stepper" aria-label="Number of guests attending">
-                  <button type="button" class="guest-stepper-btn" id="guestCountMinus"
-                    aria-label="Decrease guests">−</button>
-                  <span class="guest-stepper-value" id="guestCountValue">1</span>
-                  <button type="button" class="guest-stepper-btn" id="guestCountPlus"
-                    aria-label="Increase guests">+</button>
-                </div>
-                <div class="invitees-fields" id="inviteesFields"></div>
-              </div>
-
-              <label>
-                Message
-                <textarea name="message" rows="4" placeholder="Share your wishes..."></textarea>
-              </label>
-
-              <button type="submit">Send RSVP</button>
-              <p id="rsvpNote" class="form-note" aria-live="polite"></p>
-            </form>
-          </div>
-        </section>
-
-        <section class="section closing">
-          <div class="container reveal closing-wrap">
-            <p>With full hearts, we are thrilled to<br>celebrate this new beginning with you.</p>
-          </div>
-        </section>
-      </main>
-
-      <footer class="footer">
-        <p>
-          <span class="footer-love">With Love,</span><br>
-          <span class="footer-family">Mr &amp; Mrs. Andreas Koeswanto<br>Mr &amp; Mrs. Francis Hariono<br>Andrew &amp;
-            Evelyn</span>
-        </p>
-      </footer>
+  <div class="video-opener" id="videoOpener" role="button" tabindex="0" aria-label="Play opening video">
+    <video id="openerVideo" muted playsinline preload="auto" poster="assets/opener-envelope.png">
+      <source src="assets/envelope-01.mp4" type="video/mp4" />
+    </video>
+    <div class="video-opener-overlay" aria-hidden="true">
+      <p class="video-opener-instruction">Tap anywhere to begin</p>
     </div>
   </div>
+
+  <header class="hero" id="top">
+    <div class="hero-media parallax" data-speed="0.06" aria-hidden="true">
+      <img src="assets/photo-portrait.jpg" alt="Andrew and Evelyn portrait at the lake overlook" />
+    </div>
+    <div class="hero-overlay" aria-hidden="true"></div>
+
+    <div class="hero-content reveal show">
+      <h1>
+        <span class="hero-name hero-chip">Andrew Koeswanto</span>
+        <span class="hero-name amp hero-chip">&amp;</span>
+        <span class="hero-name hero-chip no-break">Evelyn Hariono</span>
+      </h1>
+      <p class="hero-subtitle">Wedding RSVP</p>
+    </div>
+    <a class="hero-link hero-scroll" href="#details" aria-label="Scroll to wedding details">↓</a>
+  </header>
+
+  <main>
+    <section class="section details" id="details">
+      <div class="container reveal">
+        <p class="section-label">Wedding Week</p>
+        <h2>An intimate celebration with our closest family and friends</h2>
+
+        <div class="details-grid">
+          <article class="detail-card reveal">
+            <p class="detail-date">October 19, 2026</p>
+            <h3>Welcome Dinner</h3>
+          </article>
+
+          <article class="detail-card detail-card-day reveal">
+            <p class="detail-date">October 20, 2026</p>
+            <div class="detail-event">
+              <h3>Holy Matrimony</h3>
+              <div class="detail-meta">
+                <p class="detail-time">3:00 PM to 4:00 PM</p>
+                <p class="detail-location">St Mary's Cathedral</p>
+              </div>
+            </div>
+            <div class="detail-event">
+              <h3>Reception</h3>
+              <div class="detail-meta">
+                <p class="detail-time">6:30 PM onwards</p>
+                <p class="detail-location">Bennelong, Sydney Opera House</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="detail-card reveal">
+            <p class="detail-date">October 21, 2026</p>
+            <h3>Farewell Lunch</h3>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section gallery" id="gallery">
+      <div class="container">
+        <article class="gallery-copy reveal">
+          <p class="section-label">Gallery</p>
+          <h2>Moments we will always remember</h2>
+        </article>
+
+        <div class="gallery-roll reveal" aria-label="Photo gallery">
+          <div class="gallery-scroll" tabindex="0" aria-label="Photo gallery carousel">
+            <figure class="gallery-card">
+              <img src="Rsvp Pics/photo urut/1.jpg" alt="Gallery photo 1" loading="lazy" />
+            </figure>
+            <figure class="gallery-card">
+              <img src="Rsvp Pics/photo urut/2.jpeg" alt="Gallery photo 2" loading="lazy" />
+            </figure>
+            <figure class="gallery-card">
+              <img src="Rsvp Pics/photo urut/3.jpg" alt="Gallery photo 3" loading="lazy" />
+            </figure>
+            <figure class="gallery-card">
+              <img src="Rsvp Pics/photo urut/4.jpg" alt="Gallery photo 4" loading="lazy" />
+            </figure>
+            <figure class="gallery-card">
+              <img src="Rsvp Pics/photo urut/5.jpg" alt="Gallery photo 5" loading="lazy" />
+            </figure>
+            <figure class="gallery-card">
+              <img src="Rsvp Pics/photo urut/6.png" alt="Gallery photo 6" loading="lazy" />
+            </figure>
+            <figure class="gallery-card">
+              <img src="Rsvp Pics/photo urut/7.jpg" alt="Gallery photo 7" loading="lazy" />
+            </figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section rsvp" id="rsvp">
+      <div class="container narrow reveal">
+        <p class="section-label">RSVP</p>
+        <h2>We would be honored by your presence</h2>
+        <p class="rsvp-policy">We're delighted to host you at our wedding!<br>Three nights of accomodation will be
+          provided.</p>
+
+        <form class="rsvp-form" id="rsvpForm" novalidate data-webhook-url="/api/rsvp"
+          data-google-webhook-url="https://script.google.com/macros/s/AKfycbyoDM5iWujRnymL37qgRsL19XMFLJbwTZlijuWvlrRftjeGJmAfF4dgD6KQrousuxUneg/exec">
+          <label>
+            Guest Name
+            <input type="text" name="name" required />
+          </label>
+
+          <label>
+            Attendance
+            <select name="attendance" required>
+              <option value="">Select your response</option>
+              <option value="yes">Joyfully accept</option>
+              <option value="no">Regretfully decline</option>
+            </select>
+          </label>
+
+          <input type="hidden" name="guests" value="1" />
+
+          <div class="invitees-block" id="inviteesBlock" hidden>
+            <p class="invitees-title">Who is coming?</p>
+            <p class="invitees-note" id="inviteesNote"></p>
+            <div class="guest-stepper" aria-label="Number of guests attending">
+              <button type="button" class="guest-stepper-btn" id="guestCountMinus"
+                aria-label="Decrease guests">−</button>
+              <span class="guest-stepper-value" id="guestCountValue">1</span>
+              <button type="button" class="guest-stepper-btn" id="guestCountPlus"
+                aria-label="Increase guests">+</button>
+            </div>
+            <div class="invitees-fields" id="inviteesFields"></div>
+          </div>
+
+          <label>
+            Message
+            <textarea name="message" rows="4" placeholder="Share your wishes..."></textarea>
+          </label>
+
+          <button type="submit">Send RSVP</button>
+          <p id="rsvpNote" class="form-note" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
+    <section class="section closing">
+      <div class="container reveal closing-wrap">
+        <p>With full hearts, we are thrilled to<br>celebrate this new beginning with you.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>
+      <span class="footer-love">With Love,</span><br>
+      <span class="footer-family">Mr &amp; Mrs. Andreas Koeswanto<br>Mr &amp; Mrs. Francis Hariono<br>Andrew &amp;
+        Evelyn</span>
+    </p>
+  </footer>
 
   <audio id="bgMusic" preload="metadata" loop>
     <source src="assets/Fernando Wilson - Perfect (Instrumental) - (128 Kbps).mp3" type="audio/mpeg" />
