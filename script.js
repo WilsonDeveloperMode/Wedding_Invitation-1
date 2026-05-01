@@ -68,7 +68,7 @@ function createInviteeField(index, values) {
   const wrapper = document.createElement('div');
   wrapper.className = 'invitee-card';
   wrapper.innerHTML =
-    '<p class="invitee-card-title">Person ' +
+    '<p class="invitee-card-title">Guest ' +
     index +
     '</p>' +
     '<label>Full Name<input type="text" name="guest' +
@@ -363,7 +363,7 @@ function setupRsvp() {
     const dietarySummary = normalizedGuestDietry
       .map((value, index) => {
         if (!value) return '';
-        return 'Person ' + (index + 1) + ': ' + value;
+        return 'Guest ' + (index + 1) + ': ' + value;
       })
       .filter(Boolean)
       .join(' | ');
